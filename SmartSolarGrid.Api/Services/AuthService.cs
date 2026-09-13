@@ -1,4 +1,4 @@
-﻿// ============================================================================
+// ============================================================================
 // File: AuthService.cs
 // Description: Centralized account business logic and token management.
 // Module: SE4040 Enterprise Application Development
@@ -81,15 +81,58 @@ namespace SmartSolarGrid.Api.Services
             return new AuthResponse(token, user.Nic, user.FullName, user.Role, user.Status);
         }
 
-        public Task<UserProfileResponse?> GetProfileAsync(string nic) => throw new NotImplementedException();
-        public Task<bool> UpdateProfileAsync(string nic, UpdateUserRequest request) => throw new NotImplementedException();
-        public Task<bool> RequestDeactivationAsync(string nic) => throw new NotImplementedException();
-        public Task<bool> ReactivateAccountAsync(string nic) => throw new NotImplementedException();
-        public Task<IEnumerable<UserProfileResponse>> GetPendingActivationsAsync() => throw new NotImplementedException();
+        // Reads profile data matching the target NIC.
+        public async Task<UserProfileResponse?> GetProfileAsync(string nic)
+        {
+            var user = await _userRepo.GetOneAsync(u => u.Nic == nic);
+            if (user == null) return null;
 
+            return new UserProfileResponse(user.Nic, user.FullName, user.Email, user.Role, user.Status);
+        }
+
+        // Modifies existing profile attributes.
+        public async Task<bool> UpdateProfileAsync(string nic, UpdateUserRequest request)
+        {
+            var user = await _userRepo.GetOneAsync(u => u.Nic == nic);
+            if (user == null) return false;
+
+            user.FullName = request.FullName;
+            user.Email = request.Email;
+
+            return await _userRepo.UpdateAsync(u => u.Nic == nic, user);
+        }
+
+        // Allows prosumer to set account state to deactivated.
+        public async Task<bool> RequestDeactivationAsync(string nic)
+        {
+            var user = await _userRepo.GetOneAsync(u => u.Nic == nic);
+            if (user == null) return false;
+
+            user.Status = AccountStatus.Inactive;
+            return await _userRepo.UpdateAsync(u => u.Nic == nic, user);
+        }
+
+        // Reactivates an account (Strict Backoffice authority).
+        public async Task<bool> ReactivateAccountAsync(string nic)
+        {
+            var user = await _userRepo.GetOneAsync(u => u.Nic == nic);
+            if (user == null) return false;
+
+            user.Status = AccountStatus.Active;
+            return await _userRepo.UpdateAsync(u => u.Nic == nic, user);
+        }
+
+        // Returns all deactivated prosumers awaiting reactivation in web view.
+        public async Task<IEnumerable<UserProfileResponse>> GetPendingActivationsAsync()
+        {
+            var users = await _userRepo.FindAsync(u => u.Status == AccountStatus.Inactive);
+            return users.Select(u => new UserProfileResponse(u.Nic, u.FullName, u.Email, u.Role, u.Status));
+        }
+
+        // Signs a standard cryptographic JWT bearer token for client sessions.
         private string GenerateToken(User user)
         {
-                        var keyBytes = Encoding.UTF8.GetBytes(_config["JwtSettings:Secret"]!);
+            var keyBytes = Encoding.UTF8.GetBytes(_config["JwtSettings:Secret"]!);
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(new[]
