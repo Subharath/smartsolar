@@ -75,7 +75,25 @@ namespace SmartSolarGrid.Api.Services
             return await _nodeRepo.UpdateAsync(n => n.Id == id, node);
         }
 
-        public Task<bool> DeactivateNodeAsync(string id) => throw new NotImplementedException();
+                // Enforces Business Rule: Node deactivation is BLOCKED if active reservations exist.
+        public async Task<bool> DeactivateNodeAsync(string id)
+        {
+            var activeReservations = await _resRepo.FindAsync(r =>
+                r.StationId == id &&
+                (r.Status == ReservationStatus.Pending || r.Status == ReservationStatus.Approved) &&
+                r.ScheduledDateTime >= DateTime.UtcNow);
+
+            if (activeReservations.Any())
+            {
+                throw new InvalidOperationException("Cannot deactivate node. Active or future reservations exist for this hub.");
+            }
+
+            var node = await _nodeRepo.GetOneAsync(n => n.Id == id);
+            if (node == null) return false;
+
+            node.IsActive = false;
+            return await _nodeRepo.UpdateAsync(n => n.Id == id, node);
+        }
         public Task<EnergyBookingSlot> CreateSlotAsync(CreateSlotRequest request) => throw new NotImplementedException();
         public Task<IEnumerable<EnergyBookingSlot>> GetSlotsByNodeAsync(string stationId) => throw new NotImplementedException();
     }
