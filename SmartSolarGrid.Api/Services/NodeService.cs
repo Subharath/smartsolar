@@ -1,4 +1,4 @@
-﻿// ============================================================================
+// ============================================================================
 // File: NodeService.cs
 // Description: Microgrid node logic enforcing slot and deactivation constraints.
 // Module: SE4040 Enterprise Application Development
@@ -75,7 +75,7 @@ namespace SmartSolarGrid.Api.Services
             return await _nodeRepo.UpdateAsync(n => n.Id == id, node);
         }
 
-                // Enforces Business Rule: Node deactivation is BLOCKED if active reservations exist.
+        // Enforces Business Rule: Node deactivation is BLOCKED if active reservations exist[cite: 1].
         public async Task<bool> DeactivateNodeAsync(string id)
         {
             var activeReservations = await _resRepo.FindAsync(r =>
@@ -94,7 +94,33 @@ namespace SmartSolarGrid.Api.Services
             node.IsActive = false;
             return await _nodeRepo.UpdateAsync(n => n.Id == id, node);
         }
-        public Task<EnergyBookingSlot> CreateSlotAsync(CreateSlotRequest request) => throw new NotImplementedException();
-        public Task<IEnumerable<EnergyBookingSlot>> GetSlotsByNodeAsync(string stationId) => throw new NotImplementedException();
+
+        // Registers a scheduled time slot for an active node.
+        public async Task<EnergyBookingSlot> CreateSlotAsync(CreateSlotRequest request)
+        {
+            var node = await _nodeRepo.GetOneAsync(n => n.Id == request.StationId);
+            if (node == null || !node.IsActive)
+            {
+                throw new InvalidOperationException("Target solar station does not exist or is inactive.");
+            }
+
+            var slot = new EnergyBookingSlot
+            {
+                StationId = request.StationId,
+                StartTime = request.StartTime,
+                EndTime = request.EndTime,
+                MaxSlotCapacityKwH = request.MaxSlotCapacityKwH,
+                IsAvailable = true
+            };
+
+            await _slotRepo.CreateAsync(slot);
+            return slot;
+        }
+
+        // Reads all configured slots belonging to a microgrid station.
+        public async Task<IEnumerable<EnergyBookingSlot>> GetSlotsByNodeAsync(string stationId)
+        {
+            return await _slotRepo.FindAsync(s => s.StationId == stationId);
+        }
     }
 }
