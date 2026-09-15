@@ -78,7 +78,38 @@ namespace SmartSolarGrid.Api.Services
             return reservation;
         }
 
-        public Task<bool> UpdateReservationAsync(string reservationId, string prosumerNic, UpdateReservationRequest request) => throw new NotImplementedException();
+                // Enforces Business Rule: Reservation updates require at least 12 hours' notice.
+        public async Task<bool> UpdateReservationAsync(string reservationId, string prosumerNic, UpdateReservationRequest request)
+        {
+            var reservation = await _resRepo.GetOneAsync(r => r.Id == reservationId && r.ProsumerNic == prosumerNic);
+            if (reservation == null)
+            {
+                throw new KeyNotFoundException("Reservation not found for this prosumer.");
+            }
+
+            if (reservation.Status != ReservationStatus.Approved && reservation.Status != ReservationStatus.Pending)
+            {
+                throw new InvalidOperationException("Completed or cancelled reservations cannot be modified.");
+            }
+
+            // Notice verification: Current time must be >= 12 hours before scheduled slot
+            var hoursNotice = (reservation.ScheduledDateTime - DateTime.UtcNow).TotalHours;
+            if (hoursNotice < 12.0)
+            {
+                throw new InvalidOperationException($"Modification rejected: Updates require at least 12 hours' notice. Only {hoursNotice:F1} hours remaining.");
+            }
+
+            // Validate new scheduled time also falls within 7-day rule
+            if (request.NewScheduledDateTime < DateTime.UtcNow || request.NewScheduledDateTime > DateTime.UtcNow.AddDays(7))
+            {
+                throw new ArgumentException("New scheduled time must be within 7 days from now.");
+            }
+
+            reservation.ScheduledDateTime = request.NewScheduledDateTime;
+            reservation.EnergyAmountKwH = request.NewEnergyAmountKwH;
+
+            return await _resRepo.UpdateAsync(r => r.Id == reservationId, reservation);
+        }
         public Task<bool> CancelReservationAsync(string reservationId, string requestingUserNic, string userRole) => throw new NotImplementedException();
         public Task<bool> FinalizeTransferByQrAsync(string qrToken) => throw new NotImplementedException();
         public Task<IEnumerable<EnergyReservation>> GetProsumerReservationsAsync(string nic) => throw new NotImplementedException();
