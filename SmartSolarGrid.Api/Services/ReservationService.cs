@@ -1,4 +1,4 @@
-﻿// ============================================================================
+// ============================================================================
 // File: ReservationService.cs
 // Description: Enforces 7-day scheduling, 12-hour notice, and QR lifecycle.
 // Module: SE4040 Enterprise Application Development
@@ -69,7 +69,7 @@ namespace SmartSolarGrid.Api.Services
                 SlotId = request.SlotId,
                 ScheduledDateTime = request.ScheduledDateTime,
                 EnergyAmountKwH = request.EnergyAmountKwH,
-                Status = ReservationStatus.Approved,
+                Status = ReservationStatus.Approved, // Auto-approved upon valid parameters
                 QrPayloadToken = qrToken,
                 CreatedAt = DateTime.UtcNow
             };
@@ -78,7 +78,7 @@ namespace SmartSolarGrid.Api.Services
             return reservation;
         }
 
-                // Enforces Business Rule: Reservation updates require at least 12 hours' notice.
+        // Enforces Business Rule: Reservation updates require at least 12 hours' notice.
         public async Task<bool> UpdateReservationAsync(string reservationId, string prosumerNic, UpdateReservationRequest request)
         {
             var reservation = await _resRepo.GetOneAsync(r => r.Id == reservationId && r.ProsumerNic == prosumerNic);
@@ -110,7 +110,8 @@ namespace SmartSolarGrid.Api.Services
 
             return await _resRepo.UpdateAsync(r => r.Id == reservationId, reservation);
         }
-                // Enforces Business Rule: Cancellations require at least 12 hours' notice (unless operator overrides).
+
+        // Enforces Business Rule: Cancellations require at least 12 hours' notice (unless operator overrides).
         public async Task<bool> CancelReservationAsync(string reservationId, string requestingUserNic, string userRole)
         {
             var reservation = await _resRepo.GetOneAsync(r => r.Id == reservationId);
@@ -137,7 +138,8 @@ namespace SmartSolarGrid.Api.Services
             reservation.Status = ReservationStatus.Cancelled;
             return await _resRepo.UpdateAsync(r => r.Id == reservationId, reservation);
         }
-                // Validates QR token scanned by Grid Operator and finalizes transfer.
+
+        // Validates QR token scanned by Grid Operator and finalizes transfer.
         public async Task<bool> FinalizeTransferByQrAsync(string qrToken)
         {
             var reservation = await _resRepo.GetOneAsync(r => r.QrPayloadToken == qrToken);
@@ -161,8 +163,33 @@ namespace SmartSolarGrid.Api.Services
 
             return await _resRepo.UpdateAsync(r => r.Id == reservation.Id, reservation);
         }
-        public Task<IEnumerable<EnergyReservation>> GetProsumerReservationsAsync(string nic) => throw new NotImplementedException();
-        public Task<IEnumerable<EnergyReservation>> GetAllReservationsAsync(string? status) => throw new NotImplementedException();
-        public Task<OperationalDashboardResponse> GetDashboardMetricsAsync() => throw new NotImplementedException();
+
+        // Reads booking history for a specific prosumer.
+        public async Task<IEnumerable<EnergyReservation>> GetProsumerReservationsAsync(string nic)
+        {
+            return await _resRepo.FindAsync(r => r.ProsumerNic == nic);
+        }
+
+        // Reads all reservations with optional status filter for Grid Operators.
+        public async Task<IEnumerable<EnergyReservation>> GetAllReservationsAsync(string? status)
+        {
+            if (string.IsNullOrWhiteSpace(status))
+            {
+                return await _resRepo.GetAllAsync();
+            }
+            return await _resRepo.FindAsync(r => r.Status.ToLower() == status.ToLower());
+        }
+
+        // Computes operational dashboard summary metrics for Backoffice and Operators.
+        public async Task<OperationalDashboardResponse> GetDashboardMetricsAsync()
+        {
+            var allReservations = await _resRepo.GetAllAsync();
+            var activeNodes = await _nodeRepo.FindAsync(n => n.IsActive);
+
+            var pending = allReservations.Count(r => r.Status == ReservationStatus.Pending);
+            var approvedFuture = allReservations.Count(r => r.Status == ReservationStatus.Approved && r.ScheduledDateTime >= DateTime.UtcNow);
+
+            return new OperationalDashboardResponse(pending, approvedFuture, activeNodes.Count());
+        }
     }
 }
