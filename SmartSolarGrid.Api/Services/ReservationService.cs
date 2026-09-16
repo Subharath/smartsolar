@@ -137,7 +137,30 @@ namespace SmartSolarGrid.Api.Services
             reservation.Status = ReservationStatus.Cancelled;
             return await _resRepo.UpdateAsync(r => r.Id == reservationId, reservation);
         }
-        public Task<bool> FinalizeTransferByQrAsync(string qrToken) => throw new NotImplementedException();
+                // Validates QR token scanned by Grid Operator and finalizes transfer.
+        public async Task<bool> FinalizeTransferByQrAsync(string qrToken)
+        {
+            var reservation = await _resRepo.GetOneAsync(r => r.QrPayloadToken == qrToken);
+            if (reservation == null)
+            {
+                throw new KeyNotFoundException("Invalid QR code token. No matching reservation found.");
+            }
+
+            if (reservation.Status == ReservationStatus.Completed)
+            {
+                throw new InvalidOperationException("This reservation transaction has already been completed.");
+            }
+
+            if (reservation.Status == ReservationStatus.Cancelled)
+            {
+                throw new InvalidOperationException("Cannot complete a cancelled reservation.");
+            }
+
+            reservation.Status = ReservationStatus.Completed;
+            reservation.CompletedAt = DateTime.UtcNow;
+
+            return await _resRepo.UpdateAsync(r => r.Id == reservation.Id, reservation);
+        }
         public Task<IEnumerable<EnergyReservation>> GetProsumerReservationsAsync(string nic) => throw new NotImplementedException();
         public Task<IEnumerable<EnergyReservation>> GetAllReservationsAsync(string? status) => throw new NotImplementedException();
         public Task<OperationalDashboardResponse> GetDashboardMetricsAsync() => throw new NotImplementedException();
