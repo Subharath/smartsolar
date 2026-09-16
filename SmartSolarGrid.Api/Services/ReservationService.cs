@@ -110,7 +110,33 @@ namespace SmartSolarGrid.Api.Services
 
             return await _resRepo.UpdateAsync(r => r.Id == reservationId, reservation);
         }
-        public Task<bool> CancelReservationAsync(string reservationId, string requestingUserNic, string userRole) => throw new NotImplementedException();
+                // Enforces Business Rule: Cancellations require at least 12 hours' notice (unless operator overrides).
+        public async Task<bool> CancelReservationAsync(string reservationId, string requestingUserNic, string userRole)
+        {
+            var reservation = await _resRepo.GetOneAsync(r => r.Id == reservationId);
+            if (reservation == null)
+            {
+                throw new KeyNotFoundException("Reservation does not exist.");
+            }
+
+            // Prosumers can only cancel their own, with >= 12h notice. Grid Operators have override authority.
+            if (userRole == UserRoles.Prosumer)
+            {
+                if (reservation.ProsumerNic != requestingUserNic)
+                {
+                    throw new UnauthorizedAccessException("You can only cancel your own reservations.");
+                }
+
+                var hoursNotice = (reservation.ScheduledDateTime - DateTime.UtcNow).TotalHours;
+                if (hoursNotice < 12.0)
+                {
+                    throw new InvalidOperationException($"Cancellation rejected: Cancellations require at least 12 hours' notice. Only {hoursNotice:F1} hours remaining.");
+                }
+            }
+
+            reservation.Status = ReservationStatus.Cancelled;
+            return await _resRepo.UpdateAsync(r => r.Id == reservationId, reservation);
+        }
         public Task<bool> FinalizeTransferByQrAsync(string qrToken) => throw new NotImplementedException();
         public Task<IEnumerable<EnergyReservation>> GetProsumerReservationsAsync(string nic) => throw new NotImplementedException();
         public Task<IEnumerable<EnergyReservation>> GetAllReservationsAsync(string? status) => throw new NotImplementedException();
