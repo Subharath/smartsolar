@@ -27,9 +27,13 @@ namespace SmartSolarGrid.Api.Services
             _resRepo = resRepo;
         }
 
-        // Fetches all active microgrid hubs for map displays.
-        public async Task<IEnumerable<SolarStationInfo>> GetAllActiveNodesAsync()
+        // Fetches microgrid hubs for map displays (optionally including inactive ones for backoffice).
+        public async Task<IEnumerable<SolarStationInfo>> GetAllActiveNodesAsync(bool includeInactive = false)
         {
+            if (includeInactive)
+            {
+                return await _nodeRepo.GetAllAsync();
+            }
             return await _nodeRepo.FindAsync(n => n.IsActive);
         }
 
@@ -75,7 +79,7 @@ namespace SmartSolarGrid.Api.Services
             return await _nodeRepo.UpdateAsync(n => n.Id == id, node);
         }
 
-        // Enforces Business Rule: Node deactivation is BLOCKED if active reservations exist[cite: 1].
+        // Enforces Business Rule: Node deactivation is BLOCKED if active reservations exist.
         public async Task<bool> DeactivateNodeAsync(string id)
         {
             var activeReservations = await _resRepo.FindAsync(r =>
@@ -121,6 +125,36 @@ namespace SmartSolarGrid.Api.Services
         public async Task<IEnumerable<EnergyBookingSlot>> GetSlotsByNodeAsync(string stationId)
         {
             return await _slotRepo.FindAsync(s => s.StationId == stationId);
+        }
+
+        // Updates an existing time slot's capacity and operational window.
+        public async Task<bool> UpdateSlotAsync(string slotId, UpdateSlotRequest request)
+        {
+            var slot = await _slotRepo.GetOneAsync(s => s.Id == slotId);
+            if (slot == null) return false;
+
+            slot.StartTime = request.StartTime;
+            slot.EndTime = request.EndTime;
+            slot.MaxSlotCapacityKwH = request.MaxSlotCapacityKwH;
+            slot.IsAvailable = request.IsAvailable;
+
+            return await _slotRepo.UpdateAsync(s => s.Id == slotId, slot);
+        }
+
+        // Deletes a slot enforcing checks on active reservations.
+        public async Task<bool> DeleteSlotAsync(string slotId)
+        {
+            var activeReservations = await _resRepo.FindAsync(r =>
+                r.SlotId == slotId &&
+                (r.Status == ReservationStatus.Pending || r.Status == ReservationStatus.Approved) &&
+                r.ScheduledDateTime >= DateTime.UtcNow);
+
+            if (activeReservations.Any())
+            {
+                throw new InvalidOperationException("Cannot delete slot. Active or future reservations exist for this time window.");
+            }
+
+            return await _slotRepo.DeleteAsync(s => s.Id == slotId);
         }
     }
 }

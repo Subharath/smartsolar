@@ -18,5 +18,7 @@ namespace SmartSolarGrid.Api.Services
         Task<bool> RequestDeactivationAsync(string nic);
         Task<bool> ReactivateAccountAsync(string nic);
         Task<IEnumerable<UserProfileResponse>> GetPendingActivationsAsync();
+        Task<IEnumerable<UserProfileResponse>> GetAllUsersAsync(string? role = null);
+        Task<bool> AdminUpdateUserAsync(string nic, UpdateUserRequest request, string? role = null, string? status = null);
     }
 }

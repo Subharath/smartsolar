@@ -129,6 +129,36 @@ namespace SmartSolarGrid.Api.Services
             return users.Select(u => new UserProfileResponse(u.Nic, u.FullName, u.Email, u.Role, u.Status));
         }
 
+        // Backoffice function: Retrieves all registered system users with optional role filtering.
+        public async Task<IEnumerable<UserProfileResponse>> GetAllUsersAsync(string? role = null)
+        {
+            IEnumerable<User> users;
+            if (!string.IsNullOrWhiteSpace(role))
+            {
+                users = await _userRepo.FindAsync(u => u.Role.ToLower() == role.ToLower());
+            }
+            else
+            {
+                users = await _userRepo.GetAllAsync();
+            }
+            return users.Select(u => new UserProfileResponse(u.Nic, u.FullName, u.Email, u.Role, u.Status));
+        }
+
+        // Backoffice function: Directly updates profile information, role, or status for any user.
+        public async Task<bool> AdminUpdateUserAsync(string nic, UpdateUserRequest request, string? role = null, string? status = null)
+        {
+            var user = await _userRepo.GetOneAsync(u => u.Nic == nic);
+            if (user == null) return false;
+
+            user.FullName = request.FullName;
+            user.Email = request.Email;
+
+            if (!string.IsNullOrWhiteSpace(role)) user.Role = role;
+            if (!string.IsNullOrWhiteSpace(status)) user.Status = status;
+
+            return await _userRepo.UpdateAsync(u => u.Nic == nic, user);
+        }
+
         // Signs a standard cryptographic JWT bearer token for client sessions.
         private string GenerateToken(User user)
         {

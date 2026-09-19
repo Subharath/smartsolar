@@ -104,5 +104,32 @@ namespace SmartSolarGrid.Api.Controllers
             var list = await _authService.GetPendingActivationsAsync();
             return Ok(list);
         }
+
+        // Backoffice only: Lists all registered system users (optionally filtered by role).
+        [Authorize(Roles = UserRoles.Backoffice)]
+        [HttpGet("users")]
+        public async Task<IActionResult> GetAllUsers([FromQuery] string? role)
+        {
+            var users = await _authService.GetAllUsersAsync(role);
+            return Ok(users);
+        }
+
+        // Backoffice only: Retrieves a specific user's profile by NIC.
+        [Authorize(Roles = UserRoles.Backoffice)]
+        [HttpGet("users/{nic}")]
+        public async Task<IActionResult> GetUserByNic(string nic)
+        {
+            var user = await _authService.GetProfileAsync(nic);
+            return user == null ? NotFound() : Ok(user);
+        }
+
+        // Backoffice only: Directly updates user profile, role, or status.
+        [Authorize(Roles = UserRoles.Backoffice)]
+        [HttpPut("users/{nic}")]
+        public async Task<IActionResult> AdminUpdateUser(string nic, [FromBody] UpdateUserRequest request, [FromQuery] string? role, [FromQuery] string? status)
+        {
+            var result = await _authService.AdminUpdateUserAsync(nic, request, role, status);
+            return result ? Ok(new { message = "User updated successfully by Backoffice." }) : NotFound();
+        }
     }
 }

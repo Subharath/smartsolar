@@ -1,13 +1,15 @@
 // ============================================================================
 // File: Program.cs
-// Description: Application entry point configuring middleware, MongoDB, and DI.
+// Description: Application entry point configuring middleware, MongoDB, DI, and Swagger.
 // Module: SE4040 Enterprise Application Development
 // ============================================================================
 
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using MongoDB.Driver;
+using SmartSolarGrid.Api.Data;
 using SmartSolarGrid.Api.Models;
 using SmartSolarGrid.Api.Repositories;
 using SmartSolarGrid.Api.Services;
@@ -63,7 +65,44 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddAuthorization();
 builder.Services.AddControllers();
 
-// Enable CORS so the React/HTML web client can access the API across ports
+// Configure Swagger with JWT Bearer support
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "SmartSolar Microgrid Trading API",
+        Version = "v1",
+        Description = "SE4040 Enterprise Application Development - RESTful backend service for SmartSolar microgrids."
+    });
+
+    // Add JWT Bearer token support in Swagger UI
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = "Bearer"
+    });
+
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            Array.Empty<string>()
+        }
+    });
+});
+
+// Enable CORS so the React web client and mobile emulator can access the API across ports
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
@@ -76,9 +115,27 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
+// Enable Swagger UI in all environments for testing convenience
+app.UseSwagger();
+app.UseSwaggerUI(c =>
+{
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "SmartSolar API v1");
+    c.RoutePrefix = "swagger";
+});
+
 app.UseCors("AllowAll");
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+
+// Automatically seed sample data if MongoDB is available
+try
+{
+    await DbInitializer.SeedAsync(mongoDatabase, mongoSettings);
+}
+catch (Exception ex)
+{
+    app.Logger.LogWarning("MongoDB auto-seed skipped: {Message}", ex.Message);
+}
 
 app.Run();

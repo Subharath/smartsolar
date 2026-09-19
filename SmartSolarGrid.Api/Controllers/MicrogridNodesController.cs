@@ -24,11 +24,11 @@ namespace SmartSolarGrid.Api.Controllers
             _nodeService = nodeService;
         }
 
-        // Public/Prosumer endpoint: Retrieves active nodes for map plotting.
+        // Public/Prosumer/Backoffice endpoint: Retrieves nodes for map plotting or admin review.
         [HttpGet]
-        public async Task<IActionResult> GetAllNodes()
+        public async Task<IActionResult> GetAllNodes([FromQuery] bool includeInactive = false)
         {
-            var nodes = await _nodeService.GetAllActiveNodesAsync();
+            var nodes = await _nodeService.GetAllActiveNodesAsync(includeInactive);
             return Ok(nodes);
         }
 
@@ -89,6 +89,31 @@ namespace SmartSolarGrid.Api.Controllers
         {
             var slots = await _nodeService.GetSlotsByNodeAsync(id);
             return Ok(slots);
+        }
+
+        // Backoffice/Operator: Updates an existing time slot.
+        [Authorize(Roles = $"{UserRoles.Backoffice},{UserRoles.GridOperator}")]
+        [HttpPut("slots/{id}")]
+        public async Task<IActionResult> UpdateSlot(string id, [FromBody] UpdateSlotRequest request)
+        {
+            var updated = await _nodeService.UpdateSlotAsync(id, request);
+            return updated ? Ok(new { message = "Slot updated successfully." }) : NotFound();
+        }
+
+        // Backoffice/Operator: Deletes an operational time slot.
+        [Authorize(Roles = $"{UserRoles.Backoffice},{UserRoles.GridOperator}")]
+        [HttpDelete("slots/{id}")]
+        public async Task<IActionResult> DeleteSlot(string id)
+        {
+            try
+            {
+                var success = await _nodeService.DeleteSlotAsync(id);
+                return success ? Ok(new { message = "Slot deleted successfully." }) : NotFound();
+            }
+            catch (InvalidOperationException ex)
+            {
+                return Conflict(new { message = ex.Message });
+            }
         }
     }
 }
