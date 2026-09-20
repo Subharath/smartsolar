@@ -41,9 +41,9 @@ namespace SmartSolarGrid.Api.Services
             }
 
             var now = DateTime.UtcNow;
-            var maxAllowedDate = now.AddDays(7);
+            var maxAllowedDate = now.AddDays(7).AddHours(4);
 
-            if (request.ScheduledDateTime < now)
+            if (request.ScheduledDateTime < now.AddMinutes(-10))
             {
                 throw new ArgumentException("Reservation cannot be scheduled in the past.");
             }
@@ -53,7 +53,7 @@ namespace SmartSolarGrid.Api.Services
                 throw new ArgumentException("Reservations must strictly be scheduled within 7 days from today.");
             }
 
-            var node = await _nodeRepo.GetOneAsync(n => n.Id == request.StationId);
+            var node = await _nodeRepo.GetOneAsync(n => n.Id == request.StationId || n.StationCode == request.StationId || n.HubName == request.StationId);
             if (node == null || !node.IsActive)
             {
                 throw new InvalidOperationException("Selected solar station is unavailable or inactive.");
@@ -65,7 +65,7 @@ namespace SmartSolarGrid.Api.Services
             var reservation = new EnergyReservation
             {
                 ProsumerNic = prosumerNic,
-                StationId = request.StationId,
+                StationId = node.Id,
                 SlotId = request.SlotId,
                 ScheduledDateTime = request.ScheduledDateTime,
                 EnergyAmountKwH = request.EnergyAmountKwH,
