@@ -1,4 +1,4 @@
-﻿## Build and compiled results
+## Build and compiled results
 [Dd]ebug/
 [Dd]ebugPublic/
 [Rr]elease/
@@ -25,3 +25,16 @@ Thumbs.db
 ehthumbs.db
 Desktop.ini
 .DS_Store
+
+## Node & Web App
+node_modules/
+dist/
+
+## Android & Gradle
+.gradle/
+build/
+app/build/
+local.properties
+*.apk
+*.aab
+
