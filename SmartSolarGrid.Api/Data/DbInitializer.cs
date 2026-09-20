@@ -58,6 +58,26 @@ namespace SmartSolarGrid.Api.Data
                     },
                     new User
                     {
+                        Nic = "111111111V",
+                        FullName = "John Prosumer",
+                        Email = "john@smartsolar.lk",
+                        PasswordHash = BCrypt.Net.BCrypt.HashPassword("password123"),
+                        Role = UserRoles.Prosumer,
+                        Status = AccountStatus.Active,
+                        CreatedAt = DateTime.UtcNow
+                    },
+                    new User
+                    {
+                        Nic = "222222222V",
+                        FullName = "Jane Operator",
+                        Email = "jane@smartsolar.lk",
+                        PasswordHash = BCrypt.Net.BCrypt.HashPassword("password123"),
+                        Role = UserRoles.GridOperator,
+                        Status = AccountStatus.Active,
+                        CreatedAt = DateTime.UtcNow
+                    },
+                    new User
+                    {
                         Nic = "199212345678",
                         FullName = "Sunil Fernando (Inactive)",
                         Email = "sunil@gmail.com",
