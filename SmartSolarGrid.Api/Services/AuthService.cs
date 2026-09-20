@@ -64,12 +64,14 @@ namespace SmartSolarGrid.Api.Services
         // Authenticates credentials and validates active account status.
         public async Task<AuthResponse> LoginAsync(LoginRequest request)
         {
-            var formattedNic = request.Nic.Trim().ToUpper();
-            var user = await _userRepo.GetOneAsync(u => u.Nic == formattedNic);
+            var formattedIdentifier = request.Nic.Trim();
+            var user = await _userRepo.GetOneAsync(u =>
+                u.Nic.ToUpper() == formattedIdentifier.ToUpper() ||
+                u.Email.ToLower() == formattedIdentifier.ToLower());
 
             if (user == null || !BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
             {
-                throw new UnauthorizedAccessException("Invalid NIC or password provided.");
+                throw new UnauthorizedAccessException("Invalid credentials provided.");
             }
 
             if (user.Status == AccountStatus.Inactive)
