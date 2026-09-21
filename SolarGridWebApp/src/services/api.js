@@ -7,10 +7,12 @@
  * 3. Replace mock helpers in services/mockData.js with real endpoints
  */
 
-const API_BASE_URL = 'http://localhost:5000/api';
+const API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+  ? 'http://localhost:5025/api'
+  : `http://${window.location.hostname}:5025/api`;
 
-// Toggle this to false once the C# backend is connected
-export const USE_MOCK_DATA = true;
+// Use real ASP.NET Core Web API
+export const USE_MOCK_DATA = false;
 
 export async function apiRequest(endpoint, options = {}) {
   const token = localStorage.getItem('authToken');
