@@ -1,32 +1,10 @@
 import { createContext, useContext, useState, useEffect } from 'react';
+import { api } from '../services/api';
 
 /**
- * AuthContext – stores logged-in user and role.
- *
- * MOCK AUTHENTICATION (development only):
- * Replace login() with a real call to the C# API later.
- * Example: POST /api/auth/login
+ * AuthContext – manages authenticated session and roles via C# Web API.
  */
-
 const AuthContext = createContext(null);
-
-// DEV ONLY – not production credentials
-const MOCK_USERS = [
-  {
-    email: 'backoffice@test.com',
-    nic: '199012345678',
-    password: 'password123',
-    name: 'Admin User',
-    role: 'Backoffice',
-  },
-  {
-    email: 'operator@test.com',
-    nic: '198567890123',
-    password: 'password123',
-    name: 'Grid Operator One',
-    role: 'GridOperator',
-  },
-];
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
@@ -47,39 +25,31 @@ export function AuthProvider({ children }) {
   }, []);
 
   /**
-   * MOCK login – replace this body with api.post('/auth/login', { email, password })
-   * when the C# backend is ready.
+   * Real backend login via POST /api/Auth/login
    */
   async function login(identifier, password) {
-    // Simulate network delay
-    await new Promise((r) => setTimeout(r, 400));
+    try {
+      const res = await api.post('/Auth/login', {
+        nic: (identifier || '').trim(),
+        password: password
+      });
 
-    const idClean = (identifier || '').trim().toLowerCase();
-    const found = MOCK_USERS.find(
-      (u) =>
-        (u.email.toLowerCase() === idClean ||
-          (u.nic && u.nic.toLowerCase() === idClean)) &&
-        u.password === password
-    );
+      const authUser = {
+        nic: res.nic,
+        email: res.email || identifier,
+        name: res.fullName,
+        role: res.role,
+        status: res.status
+      };
 
-    if (!found) {
-      throw new Error('Invalid email or password.');
+      localStorage.setItem('authUser', JSON.stringify(authUser));
+      localStorage.setItem('authToken', res.token);
+      setUser(authUser);
+
+      return authUser;
+    } catch (err) {
+      throw new Error(err.message || 'Login failed. Check server status or credentials.');
     }
-
-    const authUser = {
-      email: found.email,
-      name: found.name,
-      role: found.role,
-    };
-
-    // Fake token for future Authorization header use
-    const fakeToken = `mock-token-${found.role}-${Date.now()}`;
-
-    localStorage.setItem('authUser', JSON.stringify(authUser));
-    localStorage.setItem('authToken', fakeToken);
-    setUser(authUser);
-
-    return authUser;
   }
 
   function logout() {
