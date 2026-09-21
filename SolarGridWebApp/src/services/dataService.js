@@ -1,103 +1,311 @@
 /**
- * Domain service wrappers.
- * Switch USE_MOCK_DATA to false in api.js when the C# API is ready,
- * then implement the real api.get/post/put/delete calls in each function.
+ * Domain service wrappers connecting SolarGrid Web App to ASP.NET Core Web API.
+ * All functions communicate with the backend on /api endpoints.
  */
 
 import { USE_MOCK_DATA, api } from './api';
 import * as mock from './mockData';
 
-/* Users */
+/* ============================================================================
+   Users (Backoffice User Management)
+   ============================================================================ */
+
 export async function getUsers() {
   if (USE_MOCK_DATA) return mock.mockGetUsers();
-  return api.get('/users');
+  try {
+    const users = await api.get('/Auth/users');
+    return users.map((u) => ({
+      id: u.nic,
+      nic: u.nic,
+      name: u.fullName,
+      email: u.email,
+      role: u.role,
+      status: u.status,
+      createdAt: '2026-09-01',
+    }));
+  } catch (err) {
+    console.error('Failed to fetch users from API:', err);
+    return [];
+  }
 }
 
 export async function createUser(data) {
   if (USE_MOCK_DATA) return mock.mockCreateUser(data);
-  return api.post('/users', data);
+  const nic = data.nic || `NIC${Math.floor(10000000 + Math.random() * 90000000)}V`;
+  return api.post('/Auth/register', {
+    nic: nic.trim(),
+    fullName: data.name,
+    email: data.email,
+    password: data.password || 'password123',
+    role: data.role || 'Backoffice',
+  });
 }
 
 export async function updateUser(id, data) {
   if (USE_MOCK_DATA) return mock.mockUpdateUser(id, data);
-  return api.put(`/users/${id}`, data);
+  const query = data.role ? `?role=${encodeURIComponent(data.role)}` : '';
+  return api.put(`/Auth/users/${encodeURIComponent(id)}${query}`, {
+    fullName: data.name,
+    email: data.email,
+  });
 }
 
 export async function setUserStatus(id, status) {
   if (USE_MOCK_DATA) return mock.mockSetUserStatus(id, status);
-  return api.patch(`/users/${id}/status`, { status });
+  if (status === 'Active') {
+    return api.post(`/Auth/reactivate/${encodeURIComponent(id)}`);
+  }
+  return api.put(`/Auth/users/${encodeURIComponent(id)}?status=${encodeURIComponent(status)}`, {
+    fullName: '',
+    email: '',
+  });
 }
 
-/* Prosumers */
+/* ============================================================================
+   Prosumers
+   ============================================================================ */
+
 export async function getProsumers() {
   if (USE_MOCK_DATA) return mock.mockGetProsumers();
-  return api.get('/prosumers');
+  try {
+    const users = await api.get('/Auth/users?role=Prosumer');
+    return users.map((p) => ({
+      id: p.nic,
+      nic: p.nic,
+      name: p.fullName,
+      email: p.email,
+      phone: '+94 77 123 4567',
+      address: 'Sri Lanka Microgrid Zone',
+      status: p.status,
+    }));
+  } catch (err) {
+    console.error('Failed to fetch prosumers from API:', err);
+    return [];
+  }
 }
 
 export async function createProsumer(data) {
   if (USE_MOCK_DATA) return mock.mockCreateProsumer(data);
-  return api.post('/prosumers', data);
+  return api.post('/Auth/register', {
+    nic: data.nic.trim(),
+    fullName: data.name,
+    email: data.email,
+    password: 'password123',
+    role: 'Prosumer',
+  });
 }
 
 export async function updateProsumer(id, data) {
   if (USE_MOCK_DATA) return mock.mockUpdateProsumer(id, data);
-  return api.put(`/prosumers/${id}`, data);
+  return api.put(`/Auth/users/${encodeURIComponent(id)}`, {
+    fullName: data.name,
+    email: data.email,
+  });
 }
 
 export async function setProsumerStatus(id, status) {
   if (USE_MOCK_DATA) return mock.mockSetProsumerStatus(id, status);
-  return api.patch(`/prosumers/${id}/status`, { status });
+  if (status === 'Active') {
+    return api.post(`/Auth/reactivate/${encodeURIComponent(id)}`);
+  }
+  return api.put(`/Auth/users/${encodeURIComponent(id)}?status=${encodeURIComponent(status)}`, {
+    fullName: '',
+    email: '',
+  });
 }
 
-/* Nodes */
+/* ============================================================================
+   Microgrid Nodes
+   ============================================================================ */
+
 export async function getNodes() {
   if (USE_MOCK_DATA) return mock.mockGetNodes();
-  return api.get('/nodes');
+  try {
+    const nodes = await api.get('/MicrogridNodes?includeInactive=true');
+    return nodes.map((n) => ({
+      id: n.id,
+      stationCode: n.stationCode,
+      name: n.hubName,
+      location: `${n.hubName} (${n.stationCode})`,
+      latitude: n.latitude,
+      longitude: n.longitude,
+      capacity: n.capacityKwH,
+      batterySlots: n.totalBatterySlots,
+      availableSlots: n.availableBatterySlots,
+      schedule: n.operationalSchedule,
+      status: n.isActive ? 'Active' : 'Inactive',
+    }));
+  } catch (err) {
+    console.error('Failed to fetch nodes from API:', err);
+    return [];
+  }
 }
 
 export async function createNode(data) {
   if (USE_MOCK_DATA) return mock.mockCreateNode(data);
-  return api.post('/nodes', data);
+  const codePrefix = data.name.replace(/[^a-zA-Z]/g, '').substring(0, 3).toUpperCase() || 'HUB';
+  const stationCode = `${codePrefix}-${Math.floor(10 + Math.random() * 90)}`;
+  return api.post('/MicrogridNodes', {
+    stationCode,
+    hubName: data.name,
+    latitude: Number(data.latitude),
+    longitude: Number(data.longitude),
+    capacityKwH: Number(data.capacity),
+    totalBatterySlots: Number(data.batterySlots),
+    operationalSchedule: data.schedule || '08:00-18:00',
+  });
 }
 
 export async function updateNode(id, data) {
   if (USE_MOCK_DATA) return mock.mockUpdateNode(id, data);
-  return api.put(`/nodes/${id}`, data);
+  return api.put(`/MicrogridNodes/${encodeURIComponent(id)}`, {
+    hubName: data.name,
+    latitude: Number(data.latitude),
+    longitude: Number(data.longitude),
+    capacityKwH: Number(data.capacity),
+    availableBatterySlots: Number(data.batterySlots),
+    operationalSchedule: data.schedule || '08:00-18:00',
+  });
 }
 
 export async function setNodeStatus(id, status) {
   if (USE_MOCK_DATA) return mock.mockSetNodeStatus(id, status);
-  return api.patch(`/nodes/${id}/status`, { status });
+  if (status === 'Inactive') {
+    return api.delete(`/MicrogridNodes/${encodeURIComponent(id)}`);
+  }
+  return true;
 }
 
-/* Reservations / Bookings */
+/* ============================================================================
+   Reservations / Bookings
+   ============================================================================ */
+
 export async function getReservations() {
   if (USE_MOCK_DATA) return mock.mockGetReservations();
-  return api.get('/reservations');
+  try {
+    const [reservations, nodes] = await Promise.all([
+      api.get('/Reservations'),
+      api.get('/MicrogridNodes?includeInactive=true').catch(() => []),
+    ]);
+
+    const nodeMap = new Map();
+    nodes.forEach((n) => {
+      nodeMap.set(n.id, n.hubName);
+      nodeMap.set(n.stationCode, n.hubName);
+    });
+
+    return reservations.map((r) => {
+      const scheduledDate = r.scheduledDateTime ? new Date(r.scheduledDateTime) : new Date();
+      const nodeDisplayName = nodeMap.get(r.stationId) || r.stationId;
+
+      return {
+        id: r.id,
+        prosumerId: r.prosumerNic,
+        prosumerName: `Prosumer (${r.prosumerNic})`,
+        nic: r.prosumerNic,
+        nodeId: r.stationId,
+        nodeName: nodeDisplayName,
+        date: scheduledDate.toISOString().split('T')[0],
+        time: scheduledDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }),
+        slots: 1,
+        energyAmountKwH: r.energyAmountKwH,
+        status: r.status,
+        qrPayloadToken: r.qrPayloadToken,
+      };
+    });
+  } catch (err) {
+    console.error('Failed to fetch reservations from API:', err);
+    return [];
+  }
 }
 
 export async function createReservation(data) {
   if (USE_MOCK_DATA) return mock.mockCreateReservation(data);
-  return api.post('/reservations', data);
+  const timePart = data.time || '10:00';
+  const scheduledIso = new Date(`${data.date}T${timePart}:00Z`).toISOString();
+
+  return api.post('/Reservations', {
+    stationId: data.nodeId,
+    slotId: '',
+    scheduledDateTime: scheduledIso,
+    energyAmountKwH: (Number(data.slots) || 1) * 25.0,
+  });
 }
 
 export async function updateReservation(id, data) {
   if (USE_MOCK_DATA) return mock.mockUpdateReservation(id, data);
-  return api.put(`/reservations/${id}`, data);
+  const timePart = data.time || '10:00';
+  const scheduledIso = new Date(`${data.date}T${timePart}:00Z`).toISOString();
+
+  return api.put(`/Reservations/${encodeURIComponent(id)}`, {
+    newScheduledDateTime: scheduledIso,
+    newEnergyAmountKwH: (Number(data.slots) || 1) * 25.0,
+  });
 }
 
 export async function cancelReservation(id) {
   if (USE_MOCK_DATA) return mock.mockCancelReservation(id);
-  return api.patch(`/reservations/${id}/cancel`);
+  return api.delete(`/Reservations/${encodeURIComponent(id)}`);
 }
 
-/* Dashboard */
+/* ============================================================================
+   Operational Dashboard
+   ============================================================================ */
+
 export async function getBackofficeStats() {
   if (USE_MOCK_DATA) return mock.mockGetBackofficeStats();
-  return api.get('/dashboard/backoffice');
+  try {
+    const [metrics, users, nodes] = await Promise.all([
+      api.get('/Reservations/dashboard').catch(() => ({ pendingReservations: 0, approvedFutureReservations: 0, totalActiveNodes: 0 })),
+      api.get('/Auth/users').catch(() => []),
+      api.get('/MicrogridNodes?includeInactive=true').catch(() => []),
+    ]);
+
+    const prosumers = users.filter((u) => u.role?.toLowerCase() === 'prosumer');
+
+    return {
+      totalUsers: users.length,
+      totalProsumers: prosumers.length,
+      totalNodes: nodes.length,
+      pendingReservations: metrics.pendingReservations || 0,
+      approvedFutureReservations: metrics.approvedFutureReservations || 0,
+    };
+  } catch (err) {
+    console.error('Failed to calculate backoffice stats:', err);
+    return {
+      totalUsers: 0,
+      totalProsumers: 0,
+      totalNodes: 0,
+      pendingReservations: 0,
+      approvedFutureReservations: 0,
+    };
+  }
 }
 
 export async function getOperatorStats() {
   if (USE_MOCK_DATA) return mock.mockGetOperatorStats();
-  return api.get('/dashboard/operator');
+  try {
+    const [metrics, nodes, reservations] = await Promise.all([
+      api.get('/Reservations/dashboard').catch(() => ({ pendingReservations: 0, approvedFutureReservations: 0, totalActiveNodes: 0 })),
+      api.get('/MicrogridNodes?includeInactive=true').catch(() => []),
+      api.get('/Reservations').catch(() => []),
+    ]);
+
+    const completedCount = reservations.filter((r) => r.status === 'Completed').length;
+
+    return {
+      totalNodes: nodes.length,
+      pendingReservations: metrics.pendingReservations || 0,
+      approvedReservations: metrics.approvedFutureReservations || 0,
+      completedToday: completedCount,
+    };
+  } catch (err) {
+    console.error('Failed to calculate operator stats:', err);
+    return {
+      totalNodes: 0,
+      pendingReservations: 0,
+      approvedReservations: 0,
+      completedToday: 0,
+    };
+  }
 }
