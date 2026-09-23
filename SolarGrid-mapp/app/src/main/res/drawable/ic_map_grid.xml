@@ -1,0 +1,25 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="120dp"
+    android:height="100dp"
+    android:viewportWidth="120"
+    android:viewportHeight="100">
+
+    <!-- Map Grid Lines -->
+    <path
+        android:strokeColor="#80F6C119"
+        android:strokeWidth="1"
+        android:pathData="M10,20 L110,80 M30,10 L100,90 M50,5 L90,95 M20,70 L110,20 M10,50 L100,30" />
+
+    <!-- Station Markers -->
+    <path
+        android:fillColor="#F6C119"
+        android:pathData="M55,30 C52,30 50,32 50,35 C50,39 55,45 55,45 C55,45 60,39 60,35 C60,32 58,30 55,30 Z M55,37 C54,37 53,36 53,35 C53,34 54,33 55,33 C56,33 57,34 57,35 C57,36 56,37 55,37 Z" />
+
+    <path
+        android:fillColor="#F6C119"
+        android:pathData="M80,55 C78,55 76,57 76,60 C76,64 80,70 80,70 C80,70 84,64 84,60 C84,57 82,55 80,55 Z M80,62 C79,62 78,61 78,60 C78,59 79,58 80,58 C81,58 82,59 82,60 C82,61 81,62 80,62 Z" />
+
+    <path
+        android:fillColor="#F6C119"
+        android:pathData="M35,60 C33,60 31,62 31,65 C31,69 35,75 35,75 C35,75 39,69 39,65 C39,62 37,60 35,60 Z" />
+</vector>
