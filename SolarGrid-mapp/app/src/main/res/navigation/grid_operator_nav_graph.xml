@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/grid_operator_nav_graph"
+    app:startDestination="@id/nav_grid_operator_home">
+
+    <fragment
+        android:id="@+id/nav_grid_operator_home"
+        android:name="com.example.solargrid.GridOperatorHomeFragment" />
+
+    <fragment
+        android:id="@+id/nav_grid_operator_profile"
+        android:name="com.example.solargrid.ProfileFragment" />
+
+</navigation>
