@@ -79,7 +79,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Smarter Energy Starts With the Sun"
-            android:textColor="@color/white"
+            android:textColor="@color/black"
             android:textSize="18sp" />
     </LinearLayout>
 
@@ -102,7 +102,7 @@
             android:layout_height="52dp"
             android:orientation="horizontal"
             android:gravity="center"
-            android:background="@drawable/bg_login_button"
+            android:background="@drawable/bg_energy_button"
             android:clickable="true"
             android:focusable="true">
 
@@ -111,7 +111,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
                 android:text="Login"
-                android:textColor="#F2C300"
+                android:textColor="#FFFFFF"
                 android:textSize="20sp"
                 android:textStyle="bold" />
 
