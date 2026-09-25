@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
@@ -7,13 +9,405 @@
     android:layout_height="match_parent"
     tools:context=".BookEnergySlot">
 
-    <TextView
-        android:layout_width="wrap_content"
+    <!-- Background -->
+    <ImageView
+        android:id="@+id/backgroundImage"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:src="@drawable/dashboardbg"
+        android:scaleType="centerCrop"
+        android:contentDescription="@null"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- HEADER -->
+    <FrameLayout
+        android:id="@+id/dashboardHeader"
+        android:layout_width="0dp"
+        android:layout_height="100dp"
+        android:background="@drawable/bg_header"
+        android:clipToOutline="true"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <!-- Back button -->
+        <ImageView
+            android:id="@+id/backButton"
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:layout_gravity="start|top"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="39dp"
+            android:padding="2dp"
+            android:src="@drawable/ic_back"
+            android:background="@drawable/bg_back_button"
+            android:contentDescription="Go back"
+            android:clickable="true"
+            android:focusable="true" />
+
+        <!-- Title -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start|top"
+            android:layout_marginStart="64dp"
+            android:layout_marginTop="30dp"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Book "
+                    android:textColor="@android:color/white"
+                    android:textSize="22sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Energy Slot"
+                    android:textColor="#00B565"
+                    android:textSize="22sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="Select a date and time to reserve your energy slot"
+                android:textColor="#D0D0D0"
+                android:textSize="12sp" />
+
+        </LinearLayout>
+
+        <!-- Notification -->
+        <ImageView
+            android:id="@+id/notificationButton"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_gravity="end|top"
+            android:layout_marginTop="38dp"
+            android:layout_marginEnd="12dp"
+            android:padding="7dp"
+            android:src="@drawable/notification"
+            android:background="@android:color/transparent"
+            android:contentDescription="Notifications" />
+
+    </FrameLayout>
+
+
+    <!-- SCROLLABLE FORM -->
+    <ScrollView
+        android:id="@+id/reservationScroll"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Book energy slot "
-        android:textColor="@android:color/white"
-        android:textSize="22sp"
-        android:textStyle="bold"
-        tools:ignore="MissingConstraints" />
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:fillViewport="false"
+        android:clipToPadding="false"
+        app:layout_constraintTop_toBottomOf="@id/dashboardHeader"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintVertical_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingTop="16dp"
+            android:paddingBottom="20dp"
+            android:background="@drawable/reservation_card_bg">
+
+            <!-- FORM TITLE -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="Reservation&#10;Details"
+                android:textColor="#F6C119"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:lineSpacingExtra="-2dp" />
+
+
+            <!-- ========================= -->
+            <!-- SELECTED POWER STATION -->
+            <!-- ========================= -->
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="18dp"
+                android:layout_marginTop="14dp"
+                android:layout_marginEnd="18dp"
+                android:orientation="vertical">
+
+                <!-- Section label -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:layout_width="26dp"
+                        android:layout_height="26dp"
+                        android:src="@drawable/ic_station"
+                        android:scaleType="centerInside"
+                        android:contentDescription="Power station" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="7dp"
+                        android:text="Selected Power Station"
+                        android:textColor="#C8C8C8"
+                        android:textSize="13sp" />
+
+                </LinearLayout>
+
+
+                <!-- Station Card -->
+                <LinearLayout
+                    android:id="@+id/selectedStationCard"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:layout_marginTop="7dp"
+                    android:background="@drawable/selected_station_bg"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingStart="10dp"
+                    android:paddingEnd="10dp"
+                    android:clickable="true"
+                    android:focusable="true">
+
+                    <!-- Station image -->
+                    <ImageView
+                        android:id="@+id/selectedStationImage"
+                        android:layout_width="58dp"
+                        android:layout_height="42dp"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/station"
+                        android:background="@drawable/station_image_bg"
+                        android:clipToOutline="true"
+                        android:outlineProvider="background"
+                        android:contentDescription="Selected power station" />
+
+                    <!-- Station name -->
+                    <TextView
+                        android:id="@+id/selectedStationName"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        android:layout_weight="1"
+                        android:text="Mahavali Sub"
+                        android:textColor="#FFFFFF"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+
+                    <!-- Close/change icon -->
+                    <TextView
+                        android:id="@+id/changeStationButton"
+                        android:layout_width="30dp"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:text="×"
+                        android:textColor="#FFFFFF"
+                        android:textSize="18sp"
+                        android:clickable="true"
+                        android:focusable="true" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+
+            <!-- ========================= -->
+            <!-- SELECT DATE -->
+            <!-- ========================= -->
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="18dp"
+                android:layout_marginTop="18dp"
+                android:layout_marginEnd="18dp"
+                android:orientation="vertical">
+
+                <!-- Date header -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:layout_width="26dp"
+                            android:layout_height="26dp"
+                            android:src="@drawable/ic_calendar"
+                            android:scaleType="centerInside"
+                            android:contentDescription="Calendar icon" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="7dp"
+                            android:text="Select Date"
+                            android:textColor="#C8C8C8"
+                            android:textSize="13sp" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <!-- Date picker field -->
+                <TextView
+                    android:id="@+id/dateButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:layout_marginTop="9dp"
+                    android:gravity="center_vertical"
+                    android:paddingStart="12dp"
+                    android:text="Select Date"
+                    android:textColor="#D0D0D0"
+                    android:textSize="14sp"
+                    android:background="@drawable/time_field_bg"
+                    android:clickable="true"
+                    android:focusable="true" />
+
+            </LinearLayout>
+
+
+            <!-- ========================= -->
+            <!-- SELECT TIME -->
+            <!-- ========================= -->
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="18dp"
+                android:layout_marginTop="18dp"
+                android:layout_marginEnd="18dp"
+                android:orientation="vertical">
+
+                <!-- Time header -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <!-- Clock -->
+                    <ImageView
+                        android:id="@+id/clockIcon"
+                        android:layout_width="26dp"
+                        android:layout_height="26dp"
+                        android:src="@drawable/ic_clock"
+                        android:scaleType="centerInside"
+                        android:contentDescription="Time" />
+
+                    <!-- Select Time -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="7dp"
+                        android:text="Select Time"
+                        android:textColor="#C8C8C8"
+                        android:textSize="13sp" />
+
+                </LinearLayout>
+
+
+                <!-- Time fields -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="9dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <!-- Start time -->
+                    <TextView
+                        android:id="@+id/startTimeButton"
+                        android:layout_width="0dp"
+                        android:layout_height="40dp"
+                        android:layout_marginEnd="14dp"
+                        android:layout_weight="1"
+                        android:gravity="center_vertical"
+                        android:paddingStart="12dp"
+                        android:text="Start Time"
+                        android:textColor="#D0D0D0"
+                        android:textSize="14sp"
+                        android:background="@drawable/time_field_bg"
+                        android:clickable="true"
+                        android:focusable="true" />
+
+                    <!-- End time -->
+                    <TextView
+                        android:id="@+id/endTimeButton"
+                        android:layout_width="0dp"
+                        android:layout_height="40dp"
+                        android:layout_marginStart="14dp"
+                        android:layout_weight="1"
+                        android:gravity="center_vertical"
+                        android:paddingStart="12dp"
+                        android:text="End Time"
+                        android:textColor="#D0D0D0"
+                        android:textSize="14sp"
+                        android:background="@drawable/time_field_bg"
+                        android:clickable="true"
+                        android:focusable="true" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+
+            <!-- ========================= -->
+            <!-- BOOK BUTTON -->
+            <!-- ========================= -->
+
+            <FrameLayout
+                android:id="@+id/bookEnergySlotButton"
+                android:layout_width="180dp"
+                android:layout_height="42dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="24dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:background="@drawable/bg_energy_button">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:text="Book Energy Slot"
+                    android:textColor="#FFFFFF"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
+
+            </FrameLayout>
+
+        </LinearLayout>
+
+    </ScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
