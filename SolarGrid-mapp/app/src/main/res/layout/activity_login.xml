@@ -62,6 +62,7 @@
                     android:orientation="vertical">
 
                     <TextView
+                        android:id="@+id/loginTitle"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Welcome Back!"
@@ -109,18 +110,40 @@
                     android:textSize="14sp"
                     android:textStyle="bold" />
 
-                <EditText
-                    android:id="@+id/passwordInput"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="52dp"
                     android:layout_marginTop="8dp"
                     android:background="@drawable/bg_input"
-                    android:hint="Enter your password"
-                    android:inputType="textPassword"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
                     android:paddingStart="16dp"
-                    android:paddingEnd="16dp"
-                    android:textColor="@android:color/white"
-                    android:textColorHint="#AAFFFFFF" />
+                    android:paddingEnd="16dp">
+
+                    <EditText
+                        android:id="@+id/passwordInput"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:background="@android:color/transparent"
+                        android:hint="Enter your password"
+                        android:inputType="textPassword"
+                        android:textColor="@android:color/white"
+                        android:textColorHint="#AAFFFFFF" />
+
+                    <TextView
+                        android:id="@+id/togglePassword"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:padding="8dp"
+                        android:text="Show"
+                        android:textColor="#F2C300"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
 
                 <!-- Login button -->
                 <LinearLayout
@@ -128,7 +151,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="52dp"
                     android:layout_marginTop="24dp"
-                    android:background="@drawable/bg_login_button"
+                    android:background="@drawable/bg_energy_button"
                     android:clickable="true"
                     android:focusable="true"
                     android:gravity="center"
@@ -138,7 +161,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Login"
-                        android:textColor="#F2C300"
+                        android:textColor="#FFFFFF"
                         android:textSize="18sp"
                         android:textStyle="bold" />
 
