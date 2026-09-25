@@ -25,7 +25,7 @@
     <FrameLayout
         android:id="@+id/dashboardHeader"
         android:layout_width="0dp"
-        android:layout_height="125dp"
+        android:layout_height="100dp"
         android:background="@drawable/bg_header"
         android:clipToOutline="true"
         app:layout_constraintTop_toTopOf="parent"
