@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.widget.LinearLayout
-import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -14,6 +13,21 @@ class MainActivity : AppCompatActivity() {
     @SuppressLint("WrongViewCast", "MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Auto-navigate if session already exists
+        val session = SolarGridDbHelper(this).getSession()
+        if (session != null && session.token.isNotEmpty()) {
+            val intent = if (session.role.equals("GridOperator", ignoreCase = true) ||
+                session.role.equals("GRID_OPERATOR", ignoreCase = true)) {
+                Intent(this, GridOperatorDashboard::class.java)
+            } else {
+                Intent(this, ProcumerDashboard::class.java)
+            }
+            startActivity(intent)
+            finish()
+            return
+        }
+
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
@@ -22,19 +36,14 @@ class MainActivity : AppCompatActivity() {
             insets
         }
 
-        // login button navigation
-        val loginButton  = findViewById<LinearLayout>(R.id.loginButton);
-        loginButton.setOnClickListener {
-            val intent = Intent(this, LoginActivity::class.java)
-            startActivity(intent)
+        // Login button navigation
+        findViewById<LinearLayout>(R.id.loginButton)?.setOnClickListener {
+            startActivity(Intent(this, LoginActivity::class.java))
         }
 
-        // register button navigation
-        val registerButton  = findViewById<LinearLayout>(R.id.registerButton);
-        registerButton.setOnClickListener {
-            val intent = Intent(this, RegisterActivity::class.java)
-            startActivity(intent)
+        // Register button navigation
+        findViewById<LinearLayout>(R.id.registerButton)?.setOnClickListener {
+            startActivity(Intent(this, RegisterActivity::class.java))
         }
-
     }
 }
