@@ -9,6 +9,8 @@ x86/
 [Oo]bj/
 [Ll]ogs/
 *.log
+publish/
+[Pp]ublish/
 
 ## Visual Studio & IDEs
 .vs/
