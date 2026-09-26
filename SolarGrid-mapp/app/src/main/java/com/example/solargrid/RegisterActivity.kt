@@ -1,16 +1,20 @@
 package com.example.solargrid
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.MotionEvent
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
+import android.widget.LinearLayout
 import android.widget.ScrollView
+import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import android.content.Intent
-import android.widget.TextView
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
 
 class RegisterActivity : AppCompatActivity() {
 
@@ -33,11 +37,63 @@ class RegisterActivity : AppCompatActivity() {
             insets
         }
 
-//        login form link
+        val registerSubmitButton = findViewById<LinearLayout>(R.id.registerSubmitButton)
+        val nameInput = findViewById<EditText>(R.id.nameInput)
+        val nicInput = findViewById<EditText>(R.id.nicInput)
+        val emailInput = findViewById<EditText>(R.id.emailInput)
+        val passwordInput = findViewById<EditText>(R.id.passwordInput)
+        val confirmPasswordInput = findViewById<EditText>(R.id.confirmPasswordInput)
+
+        registerSubmitButton.setOnClickListener {
+            val name = nameInput.text.toString().trim()
+            val nic = nicInput.text.toString().trim()
+            val email = emailInput?.text?.toString()?.trim() ?: "${nic.lowercase()}@solargrid.lk"
+            val password = passwordInput.text.toString()
+            val confirmPassword = confirmPasswordInput.text.toString()
+
+            if (name.isEmpty() || nic.isEmpty() || password.isEmpty()) {
+                Toast.makeText(this, "Please fill in all required fields", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            if (password != confirmPassword) {
+                Toast.makeText(this, "Passwords do not match", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            registerSubmitButton.isEnabled = false
+            Toast.makeText(this, "Registering account...", Toast.LENGTH_SHORT).show()
+
+            lifecycleScope.launch {
+                val result = ApiClient.register(
+                    context = this@RegisterActivity,
+                    nic = nic,
+                    name = name,
+                    email = if (email.isNotEmpty()) email else "${nic.lowercase()}@solargrid.lk",
+                    pass = password,
+                    role = "Prosumer"
+                )
+                registerSubmitButton.isEnabled = true
+
+                if (result.isSuccess) {
+                    Toast.makeText(this@RegisterActivity, "Registration successful! Please login.", Toast.LENGTH_LONG).show()
+                    val intent = Intent(this@RegisterActivity, LoginActivity::class.java)
+                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    startActivity(intent)
+                    finish()
+                } else {
+                    val error = result.exceptionOrNull()?.message ?: "Registration failed."
+                    Toast.makeText(this@RegisterActivity, error, Toast.LENGTH_LONG).show()
+                }
+            }
+        }
+
+        // Login form link
         val loginLink = findViewById<TextView>(R.id.loginLink)
         loginLink.setOnClickListener {
             val intent = Intent(this, LoginActivity::class.java)
             startActivity(intent)
+            finish()
         }
     }
 
