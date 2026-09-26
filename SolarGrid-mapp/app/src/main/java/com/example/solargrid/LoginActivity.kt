@@ -8,12 +8,14 @@ import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.ScrollView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-
-
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
 
 class LoginActivity : AppCompatActivity() {
 
@@ -36,20 +38,97 @@ class LoginActivity : AppCompatActivity() {
             insets
         }
 
-        // register link navigation
-        val register = findViewById<TextView>(R.id.registerLink)
+        // Allow changing server IP by long-clicking the title or header
+        findViewById<android.view.View>(R.id.loginTitle)?.setOnLongClickListener {
+            showServerConfigDialog()
+            true
+        }
 
+        // Register link navigation
+        val register = findViewById<TextView>(R.id.registerLink)
         register.setOnClickListener {
             val intent = Intent(this, RegisterActivity::class.java)
             startActivity(intent)
         }
-        // login page link
-        val login = findViewById<LinearLayout>(R.id.loginSubmitButton)
 
-        login.setOnClickListener {
-            val intent = Intent(this, ProcumerDashboard::class.java)
-            startActivity(intent)
+        // Login form
+        val loginButton = findViewById<LinearLayout>(R.id.loginSubmitButton)
+        val nicInput = findViewById<EditText>(R.id.nicInput)
+        val passwordInput = findViewById<EditText>(R.id.passwordInput)
+        val togglePassword = findViewById<TextView>(R.id.togglePassword)
+        var isPasswordVisible = false
+
+        togglePassword.setOnClickListener {
+            isPasswordVisible = !isPasswordVisible
+            val selection = passwordInput.selectionEnd
+            if (isPasswordVisible) {
+                passwordInput.transformationMethod = android.text.method.HideReturnsTransformationMethod.getInstance()
+                togglePassword.text = "Hide"
+            } else {
+                passwordInput.transformationMethod = android.text.method.PasswordTransformationMethod.getInstance()
+                togglePassword.text = "Show"
+            }
+            passwordInput.setSelection(selection.coerceIn(0, passwordInput.text?.length ?: 0))
         }
+
+        loginButton.setOnClickListener {
+            val nic = nicInput.text.toString().trim()
+            val password = passwordInput.text.toString()
+
+            if (nic.isEmpty() || password.isEmpty()) {
+                Toast.makeText(this, "Please enter NIC and password", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            loginButton.isEnabled = false
+            Toast.makeText(this, "Signing in...", Toast.LENGTH_SHORT).show()
+
+            lifecycleScope.launch {
+                val result = ApiClient.login(this@LoginActivity, nic, password)
+                loginButton.isEnabled = true
+
+                if (result.isSuccess) {
+                    val auth = result.getOrThrow()
+                    Toast.makeText(this@LoginActivity, "Welcome, ${auth.fullName}!", Toast.LENGTH_SHORT).show()
+
+                    val intent = if (auth.role.equals("GridOperator", ignoreCase = true) ||
+                        auth.role.equals("GRID_OPERATOR", ignoreCase = true)) {
+                        Intent(this@LoginActivity, GridOperatorDashboard::class.java)
+                    } else {
+                        Intent(this@LoginActivity, ProcumerDashboard::class.java)
+                    }
+                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    startActivity(intent)
+                    finish()
+                } else {
+                    val error = result.exceptionOrNull()?.message
+                        ?: "Invalid credentials. Please verify your NIC and password."
+                    Toast.makeText(this@LoginActivity, error, Toast.LENGTH_LONG).show()
+                }
+            }
+        }
+    }
+
+    private fun showServerConfigDialog() {
+        val currentUrl = ApiConfig.getBaseUrl(this)
+        val input = EditText(this).apply {
+            setText(currentUrl)
+            setSelection(currentUrl.length)
+        }
+
+        AlertDialog.Builder(this)
+            .setTitle("API Server URL")
+            .setMessage("Set Web API Base URL (use PC IP on private Wi-Fi):")
+            .setView(input)
+            .setPositiveButton("Save") { _, _ ->
+                val newUrl = input.text.toString().trim()
+                if (newUrl.isNotEmpty()) {
+                    ApiConfig.setBaseUrl(this, newUrl)
+                    Toast.makeText(this, "Saved: $newUrl", Toast.LENGTH_SHORT).show()
+                }
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
     }
 
     override fun dispatchTouchEvent(event: MotionEvent): Boolean {
@@ -78,5 +157,4 @@ class LoginActivity : AppCompatActivity() {
         }
         return super.dispatchTouchEvent(event)
     }
-
 }
