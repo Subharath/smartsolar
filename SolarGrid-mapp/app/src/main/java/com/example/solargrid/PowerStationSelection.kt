@@ -1,6 +1,7 @@
 package com.example.solargrid
 
 import android.Manifest
+import android.app.Dialog
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
@@ -8,13 +9,19 @@ import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Bundle
 import android.os.Looper
+import android.view.Gravity
+import android.view.View
+import android.view.WindowManager
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
 import org.maplibre.android.MapLibre
+import org.maplibre.android.annotations.Marker
 import org.maplibre.android.annotations.MarkerOptions
 import org.maplibre.android.camera.CameraPosition
 import org.maplibre.android.camera.CameraUpdateFactory
@@ -25,9 +32,6 @@ import org.maplibre.android.location.modes.RenderMode
 import org.maplibre.android.maps.MapLibreMap
 import org.maplibre.android.maps.MapView
 import org.maplibre.android.maps.Style
-import android.app.Dialog
-import android.view.WindowManager
-import android.widget.Button
 
 class PowerStationSelection : AppCompatActivity() {
 
@@ -38,33 +42,19 @@ class PowerStationSelection : AppCompatActivity() {
     private var loadedStyle: Style? = null
     private var currentLocation: Location? = null
 
-    private var locationEnabled = false     // component activated + updates running
-    private var firstFixHandled = false     // stations + camera only on first fix
+    private var locationEnabled = false
+    private var firstFixHandled = false
 
-    // Temporary dummy station data. Replace with backend data.
-    private data class PowerStation(
-        val name: String,
-        val latitudeOffset: Double,
-        val longitudeOffset: Double
-    )
-
-    private val dummyStations = listOf(
-        PowerStation("Power Station A", 0.003, 0.003),
-        PowerStation("Power Station B", -0.004, 0.002),
-        PowerStation("Power Station C", 0.002, -0.005),
-        PowerStation("Power Station D", -0.006, -0.003),
-        PowerStation("Power Station E", 0.007, 0.001)
-    )
+    // Real stations fetched from Web API
+    private var liveStations: List<ApiClient.StationModel> = emptyList()
+    private val markerStationMap = mutableMapOf<Marker, ApiClient.StationModel>()
 
     private val locationListener = object : LocationListener {
         override fun onLocationChanged(location: Location) {
             onLocationUpdate(location)
         }
-
-        // Required on API < 30, otherwise AbstractMethodError.
         override fun onProviderEnabled(provider: String) {}
         override fun onProviderDisabled(provider: String) {}
-
         @Deprecated("Deprecated in Java")
         override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {}
     }
@@ -79,6 +69,8 @@ class PowerStationSelection : AppCompatActivity() {
                     "Location permission is needed to find nearby stations.",
                     Toast.LENGTH_LONG
                 ).show()
+                // Still load stations even without GPS permission
+                fetchStationsAndPlot(null)
             }
         }
 
@@ -109,71 +101,57 @@ class PowerStationSelection : AppCompatActivity() {
                 mapLibreMap.animateCamera(CameraUpdateFactory.zoomOut())
             }
 
-            // Power station marker click
+            // Power station marker click -> Opens selection dialog
             mapLibreMap.setOnMarkerClickListener { marker ->
+                val station = markerStationMap[marker]
 
                 val dialog = Dialog(this)
-
                 dialog.setContentView(R.layout.dialog_power_station)
 
-                val stationTitle =
-                    dialog.findViewById<TextView>(R.id.stationTitle)
+                val stationTitle = dialog.findViewById<TextView>(R.id.stationTitle)
+                val stationDistance = dialog.findViewById<TextView>(R.id.stationDistance)
+                val continueButton = dialog.findViewById<View>(R.id.continueButton)
 
-                val stationDistance =
-                    dialog.findViewById<TextView>(R.id.stationDistance)
-
-                val continueButton =
-                    dialog.findViewById<Button>(R.id.continueButton)
-
-                stationTitle.text = marker.title
+                stationTitle.text = station?.hubName ?: marker.title
                 stationDistance.text = marker.snippet
 
                 continueButton.setOnClickListener {
-
-                    val intent = Intent(
-                        this,
-                        BookEnergySlot::class.java
-                    )
-
-                    intent.putExtra(
-                        "station_name",
-                        marker.title
-                    )
-
+                    val intent = Intent(this, BookEnergySlot::class.java).apply {
+                        putExtra("station_name", station?.hubName ?: marker.title)
+                        putExtra("station_id", station?.id ?: "")
+                        putExtra("station_code", station?.stationCode ?: "")
+                    }
                     startActivity(intent)
-
                     dialog.dismiss()
                 }
 
-                dialog.window?.setBackgroundDrawableResource(
-                    android.R.color.transparent
-                )
-
                 dialog.show()
-
-                dialog.window?.setLayout(
-                    dpToPx(300),
-                    WindowManager.LayoutParams.WRAP_CONTENT
-                )
-
+                val window = dialog.window
+                window?.setBackgroundDrawableResource(android.R.color.transparent)
+                window?.setGravity(Gravity.CENTER)
+                window?.setLayout(dpToPx(300), WindowManager.LayoutParams.WRAP_CONTENT)
                 true
             }
 
-            // demotiles has no street-level data. Use a real style.
-
-
-            // demotiles has no street-level data. Use a real style.
             mapLibreMap.setStyle("https://tiles.openfreemap.org/styles/liberty") { style ->
                 loadedStyle = style
 
-                // Fallback camera until the first fix arrives.
+                // Default center (Colombo, Sri Lanka)
                 mapLibreMap.cameraPosition = CameraPosition.Builder()
                     .target(LatLng(6.9271, 79.8612))
                     .zoom(12.0)
                     .build()
 
                 checkLocationPermission()
+                fetchStationsAndPlot(null)
             }
+        }
+    }
+
+    private fun fetchStationsAndPlot(loc: Location?) {
+        lifecycleScope.launch {
+            liveStations = ApiClient.getStations(this@PowerStationSelection)
+            showStations(loc ?: currentLocation)
         }
     }
 
@@ -201,7 +179,6 @@ class PowerStationSelection : AppCompatActivity() {
 
     // ---------- Location ----------
 
-    /** Needs: style loaded + permission granted. Safe to call more than once. */
     private fun enableLocation() {
         val style = loadedStyle ?: return
         val mapLibreMap = map ?: return
@@ -211,7 +188,7 @@ class PowerStationSelection : AppCompatActivity() {
         if (!component.isLocationComponentActivated) {
             component.activateLocationComponent(
                 LocationComponentActivationOptions.builder(this, style)
-                    .useDefaultLocationEngine(false) // we feed it from our own listener
+                    .useDefaultLocationEngine(false)
                     .build()
             )
         }
@@ -228,7 +205,6 @@ class PowerStationSelection : AppCompatActivity() {
 
         try {
             val fine = isGranted(Manifest.permission.ACCESS_FINE_LOCATION)
-
             val providers = buildList {
                 if (fine && locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
                     add(LocationManager.GPS_PROVIDER)
@@ -239,24 +215,22 @@ class PowerStationSelection : AppCompatActivity() {
             }
 
             if (providers.isEmpty()) {
-                Toast.makeText(this, "Please enable your device location.", Toast.LENGTH_LONG).show()
+                fetchStationsAndPlot(null)
                 return
             }
 
-            // Show something immediately from the cache.
             providers
                 .mapNotNull { locationManager.getLastKnownLocation(it) }
                 .maxByOrNull { it.time }
                 ?.let { onLocationUpdate(it) }
 
-            // Then stream fresh fixes.
             providers.forEach { provider ->
                 locationManager.requestLocationUpdates(
                     provider, 2000L, 0f, locationListener, Looper.getMainLooper()
                 )
             }
-        } catch (e: SecurityException) {
-            Toast.makeText(this, "Location permission is required.", Toast.LENGTH_SHORT).show()
+        } catch (_: SecurityException) {
+            fetchStationsAndPlot(null)
         }
     }
 
@@ -268,46 +242,47 @@ class PowerStationSelection : AppCompatActivity() {
         currentLocation = location
         val mapLibreMap = map ?: return
 
-        // Moves the blue dot.
         mapLibreMap.locationComponent.forceLocationUpdate(location)
 
-        // Stations + camera only once, otherwise the map fights the user's panning.
         if (!firstFixHandled) {
             firstFixHandled = true
-            showStations(location)
+            fetchStationsAndPlot(location)
             mapLibreMap.animateCamera(
                 CameraUpdateFactory.newLatLngZoom(
-                    LatLng(location.latitude, location.longitude), 14.0
+                    LatLng(location.latitude, location.longitude), 13.0
                 )
             )
         }
     }
 
-    private fun showStations(location: Location) {
+    private fun showStations(userLoc: Location?) {
         val mapLibreMap = map ?: return
-
         mapLibreMap.clear()
+        markerStationMap.clear()
 
-        dummyStations.forEach { station ->
-            val stationLat = location.latitude + station.latitudeOffset
-            val stationLng = location.longitude + station.longitudeOffset
+        liveStations.forEach { station ->
+            val distSnippet = if (userLoc != null) {
+                val result = FloatArray(1)
+                Location.distanceBetween(
+                    userLoc.latitude, userLoc.longitude,
+                    station.latitude, station.longitude, result
+                )
+                val meters = result[0]
+                if (meters < 1000) "${meters.toInt()}m away"
+                else "%.1f km away".format(meters / 1000)
+            } else {
+                "${station.capacityKwH} kW capacity"
+            }
 
-            val result = FloatArray(1)
-            Location.distanceBetween(
-                location.latitude, location.longitude,
-                stationLat, stationLng, result
-            )
-            val meters = result[0]
-            val distanceText =
-                if (meters < 1000) "${meters.toInt()} m"
-                else "%.1f km".format(meters / 1000)
+            val snippet = "$distSnippet | ${station.availableBatterySlots} slots open"
 
-            mapLibreMap.addMarker(
+            val marker = mapLibreMap.addMarker(
                 MarkerOptions()
-                    .position(LatLng(stationLat, stationLng))
-                    .title(station.name)
-                    .snippet("$distanceText away (dummy data)")
+                    .position(LatLng(station.latitude, station.longitude))
+                    .title(station.hubName)
+                    .snippet(snippet)
             )
+            markerStationMap[marker] = station
         }
     }
 
@@ -316,7 +291,7 @@ class PowerStationSelection : AppCompatActivity() {
     override fun onStart() {
         super.onStart()
         mapView.onStart()
-        startLocationUpdates() // no-op until enableLocation() has run once
+        startLocationUpdates()
     }
 
     override fun onResume() {
