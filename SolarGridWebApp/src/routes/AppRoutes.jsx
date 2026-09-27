@@ -28,16 +28,14 @@ function HomeRedirect() {
 
   if (!isAuthenticated) return <Navigate to="/login" replace />;
 
-  return (
-    <Navigate
-      to={
-        user.role === "Backoffice"
-          ? "/backoffice/dashboard"
-          : "/operator/dashboard"
-      }
-      replace
-    />
-  );
+  if (user?.role === "Backoffice") {
+    return <Navigate to="/backoffice/dashboard" replace />;
+  }
+  if (user?.role === "GridOperator") {
+    return <Navigate to="/operator/dashboard" replace />;
+  }
+
+  return <Navigate to="/login" replace />;
 }
 
 function AppRoutes() {
