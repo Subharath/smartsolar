@@ -229,11 +229,6 @@ function ReservationsPage() {
     <div className="space-y-4">
       <ErrorMessage message={error} onRetry={loadAll} />
 
-      {/* Temporary Test Button */}
-      <Button onClick={() => toast.success("Toast test", "If you can see this, the global toast system is working.")}>
-        Test Toast
-      </Button>
-
       <div className="rounded-lg border border-solar/40 bg-solar/10 px-4 py-3 text-sm text-deepGreen">
         <p className="font-medium">Reservation rules (enforced by the API)</p>
         <ul className="list-disc ml-5 mt-1 space-y-0.5 text-gray-700">
