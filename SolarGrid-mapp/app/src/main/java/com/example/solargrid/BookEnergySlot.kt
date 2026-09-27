@@ -59,7 +59,7 @@ class BookEnergySlot : AppCompatActivity() {
             val month = calendar.get(Calendar.MONTH)
             val day = calendar.get(Calendar.DAY_OF_MONTH)
 
-            DatePickerDialog(this, { _, selectedYear, selectedMonth, selectedDay ->
+            val dpd = DatePickerDialog(this, { _, selectedYear, selectedMonth, selectedDay ->
                 val chosenCal = Calendar.getInstance()
                 chosenCal.set(selectedYear, selectedMonth, selectedDay)
                 selectedCalendar = chosenCal
@@ -67,7 +67,12 @@ class BookEnergySlot : AppCompatActivity() {
                 val formattedDate = String.format(Locale.getDefault(), "%02d/%02d/%d", selectedDay, selectedMonth + 1, selectedYear)
                 dateButton.text = formattedDate
                 dateButton.setTextColor(Color.WHITE)
-            }, year, month, day).show()
+            }, year, month, day)
+
+            // Strictly enforce 7-day scheduling window
+            dpd.datePicker.minDate = System.currentTimeMillis() - 1000
+            dpd.datePicker.maxDate = System.currentTimeMillis() + (7L * 24 * 60 * 60 * 1000)
+            dpd.show()
         }
 
         // Start Time Picker
@@ -117,6 +122,18 @@ class BookEnergySlot : AppCompatActivity() {
                 set(Calendar.MINUTE, selectedMinute)
                 set(Calendar.SECOND, 0)
                 set(Calendar.MILLISECOND, 0)
+            }
+
+            // 7-day rule check
+            val now = System.currentTimeMillis()
+            val maxAllowed = now + (7L * 24 * 60 * 60 * 1000) + (4 * 3600 * 1000)
+            if (bookingCal.timeInMillis < now - 600000) {
+                Toast.makeText(this, "Reservation cannot be scheduled in the past.", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            if (bookingCal.timeInMillis > maxAllowed) {
+                Toast.makeText(this, "Reservations must strictly be scheduled within 7 days from today.", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
             }
 
             val isoFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US).apply {

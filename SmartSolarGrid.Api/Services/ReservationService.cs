@@ -79,12 +79,15 @@ namespace SmartSolarGrid.Api.Services
         }
 
         // Enforces Business Rule: Reservation updates require at least 12 hours' notice.
-        public async Task<bool> UpdateReservationAsync(string reservationId, string prosumerNic, UpdateReservationRequest request)
+        public async Task<bool> UpdateReservationAsync(string reservationId, string requestingUserNic, string userRole, UpdateReservationRequest request)
         {
-            var reservation = await _resRepo.GetOneAsync(r => r.Id == reservationId && r.ProsumerNic == prosumerNic);
+            var reservation = userRole == UserRoles.Prosumer
+                ? await _resRepo.GetOneAsync(r => r.Id == reservationId && r.ProsumerNic == requestingUserNic)
+                : await _resRepo.GetOneAsync(r => r.Id == reservationId);
+
             if (reservation == null)
             {
-                throw new KeyNotFoundException("Reservation not found for this prosumer.");
+                throw new KeyNotFoundException("Reservation not found.");
             }
 
             if (reservation.Status != ReservationStatus.Approved && reservation.Status != ReservationStatus.Pending)
@@ -100,7 +103,7 @@ namespace SmartSolarGrid.Api.Services
             }
 
             // Validate new scheduled time also falls within 7-day rule
-            if (request.NewScheduledDateTime < DateTime.UtcNow || request.NewScheduledDateTime > DateTime.UtcNow.AddDays(7))
+            if (request.NewScheduledDateTime < DateTime.UtcNow.AddMinutes(-5) || request.NewScheduledDateTime > DateTime.UtcNow.AddDays(7).AddHours(4))
             {
                 throw new ArgumentException("New scheduled time must be within 7 days from now.");
             }

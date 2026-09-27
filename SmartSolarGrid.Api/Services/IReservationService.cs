@@ -12,7 +12,7 @@ namespace SmartSolarGrid.Api.Services
     public interface IReservationService
     {
         Task<EnergyReservation> CreateReservationAsync(string prosumerNic, CreateReservationRequest request);
-        Task<bool> UpdateReservationAsync(string reservationId, string prosumerNic, UpdateReservationRequest request);
+        Task<bool> UpdateReservationAsync(string reservationId, string requestingUserNic, string userRole, UpdateReservationRequest request);
         Task<bool> CancelReservationAsync(string reservationId, string requestingUserNic, string userRole);
         Task<bool> FinalizeTransferByQrAsync(string qrToken);
         Task<IEnumerable<EnergyReservation>> GetProsumerReservationsAsync(string nic);

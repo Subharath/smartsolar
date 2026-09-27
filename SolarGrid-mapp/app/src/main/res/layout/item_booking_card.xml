@@ -108,4 +108,61 @@
         android:textColor="#F2C300"
         android:textSize="11sp" />
 
+    <!-- Action Buttons for Pending / Active Reservations -->
+    <LinearLayout
+        android:id="@+id/cardActionContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:orientation="horizontal"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/cardViewQrBtn"
+            android:layout_width="0dp"
+            android:layout_height="32dp"
+            android:layout_weight="1"
+            android:layout_marginEnd="4dp"
+            android:gravity="center"
+            android:text="View QR"
+            android:textColor="#FFFFFF"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            android:background="@drawable/bg_energy_button"
+            android:clickable="true"
+            android:focusable="true" />
+
+        <TextView
+            android:id="@+id/cardModifyBtn"
+            android:layout_width="0dp"
+            android:layout_height="32dp"
+            android:layout_weight="1"
+            android:layout_marginStart="4dp"
+            android:layout_marginEnd="4dp"
+            android:gravity="center"
+            android:text="Modify Slot"
+            android:textColor="#E0F2E9"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            android:background="@drawable/history_tab_unselected"
+            android:clickable="true"
+            android:focusable="true" />
+
+        <TextView
+            android:id="@+id/cardCancelBtn"
+            android:layout_width="0dp"
+            android:layout_height="32dp"
+            android:layout_weight="1"
+            android:layout_marginStart="4dp"
+            android:gravity="center"
+            android:text="Cancel Slot"
+            android:textColor="#FF8A80"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            android:background="@drawable/bg_outline_button"
+            android:clickable="true"
+            android:focusable="true" />
+
+    </LinearLayout>
+
 </LinearLayout>

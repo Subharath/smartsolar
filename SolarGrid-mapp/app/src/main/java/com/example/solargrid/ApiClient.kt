@@ -245,6 +245,66 @@ object ApiClient {
         }
     }
 
+    suspend fun updateReservation(
+        context: Context,
+        reservationId: String,
+        newScheduledDateTimeIso: String,
+        newEnergyKwH: Double
+    ): Result<String> = withContext(Dispatchers.IO) {
+        try {
+            val token = getToken(context) ?: return@withContext Result.failure(IOException("User is not authenticated"))
+            val url = "${getBaseUrl(context)}Reservations/$reservationId"
+            val payload = mapOf(
+                "newScheduledDateTime" to newScheduledDateTimeIso,
+                "newEnergyAmountKwH" to newEnergyKwH
+            )
+            val request = Request.Builder()
+                .url(url)
+                .addHeader("Authorization", "Bearer $token")
+                .put(gson.toJson(payload).toRequestBody(jsonMedia))
+                .build()
+
+            httpClient.newCall(request).execute().use { response ->
+                val body = response.body?.string() ?: ""
+                if (response.isSuccessful) {
+                    Result.success("Reservation updated successfully.")
+                } else {
+                    val errorMsg = extractErrorMessage(body) ?: "Failed to update reservation (requires at least 12 hours' notice)."
+                    Result.failure(IOException(errorMsg))
+                }
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun cancelReservation(
+        context: Context,
+        reservationId: String
+    ): Result<String> = withContext(Dispatchers.IO) {
+        try {
+            val token = getToken(context) ?: return@withContext Result.failure(IOException("User is not authenticated"))
+            val url = "${getBaseUrl(context)}Reservations/$reservationId"
+            val request = Request.Builder()
+                .url(url)
+                .addHeader("Authorization", "Bearer $token")
+                .delete()
+                .build()
+
+            httpClient.newCall(request).execute().use { response ->
+                val body = response.body?.string() ?: ""
+                if (response.isSuccessful) {
+                    Result.success("Reservation cancelled successfully.")
+                } else {
+                    val errorMsg = extractErrorMessage(body) ?: "Failed to cancel reservation (requires at least 12 hours' notice)."
+                    Result.failure(IOException(errorMsg))
+                }
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
     suspend fun getMyReservations(context: Context): List<ReservationModel> = withContext(Dispatchers.IO) {
         val db = SolarGridDbHelper(context)
         try {

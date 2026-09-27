@@ -229,6 +229,7 @@ export async function createReservation(data) {
     slotId: '',
     scheduledDateTime: scheduledIso,
     energyAmountKwH: (Number(data.slots) || 1) * 25.0,
+    prosumerNic: data.nic || data.prosumerId,
   });
 }
 

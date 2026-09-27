@@ -25,34 +25,40 @@ namespace SmartSolarGrid.Api.Controllers
             _resService = resService;
         }
 
-        // Prosumer: Creates an energy slot reservation (enforcing 7-day rule).
-        [Authorize(Roles = UserRoles.Prosumer)]
+        // Prosumer or Backoffice: Creates an energy slot reservation (enforcing 7-day rule).
+        [Authorize(Roles = $"{UserRoles.Prosumer},{UserRoles.Backoffice}")]
         [HttpPost]
         public async Task<IActionResult> CreateReservation([FromBody] CreateReservationRequest request)
         {
             var userNic = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var userRole = User.FindFirstValue(ClaimTypes.Role);
             if (string.IsNullOrEmpty(userNic)) return Unauthorized();
+
+            var effectiveNic = (userRole == UserRoles.Backoffice && !string.IsNullOrEmpty(request.ProsumerNic))
+                ? request.ProsumerNic
+                : userNic;
 
             try
             {
-                var reservation = await _resService.CreateReservationAsync(userNic, request);
+                var reservation = await _resService.CreateReservationAsync(effectiveNic, request);
                 return CreatedAtAction(nameof(GetMyReservations), new { id = reservation.Id }, reservation);
             }
             catch (ArgumentException ex) { return BadRequest(new { message = ex.Message }); }
             catch (InvalidOperationException ex) { return Conflict(new { message = ex.Message }); }
         }
 
-        // Prosumer: Modifies existing reservation (enforcing 12-hour rule).
-        [Authorize(Roles = UserRoles.Prosumer)]
+        // Prosumer or Backoffice: Modifies existing reservation (enforcing 12-hour rule).
+        [Authorize(Roles = $"{UserRoles.Prosumer},{UserRoles.Backoffice}")]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateReservation(string id, [FromBody] UpdateReservationRequest request)
         {
             var userNic = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var userRole = User.FindFirstValue(ClaimTypes.Role) ?? string.Empty;
             if (string.IsNullOrEmpty(userNic)) return Unauthorized();
 
             try
             {
-                var updated = await _resService.UpdateReservationAsync(id, userNic, request);
+                var updated = await _resService.UpdateReservationAsync(id, userNic, userRole, request);
                 return updated ? Ok(new { message = "Reservation updated successfully." }) : NotFound();
             }
             catch (InvalidOperationException ex) { return StatusCode(400, new { message = ex.Message }); }
