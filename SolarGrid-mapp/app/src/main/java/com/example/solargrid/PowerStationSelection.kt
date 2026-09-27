@@ -136,10 +136,10 @@ class PowerStationSelection : AppCompatActivity() {
             mapLibreMap.setStyle("https://tiles.openfreemap.org/styles/liberty") { style ->
                 loadedStyle = style
 
-                // Default center (Colombo, Sri Lanka)
+                // Default center: SLIIT Malabe Campus, Sri Lanka
                 mapLibreMap.cameraPosition = CameraPosition.Builder()
-                    .target(LatLng(6.9271, 79.8612))
-                    .zoom(12.0)
+                    .target(LatLng(6.9147, 79.9729))
+                    .zoom(13.5)
                     .build()
 
                 checkLocationPermission()

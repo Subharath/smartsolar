@@ -129,8 +129,8 @@ class GridOperatorPowerStationSelection : AppCompatActivity() {
                 loadedStyle = style
 
                 mapLibreMap.cameraPosition = CameraPosition.Builder()
-                    .target(LatLng(6.9271, 79.8612))
-                    .zoom(12.0)
+                    .target(LatLng(6.9147, 79.9729)) // SLIIT Malabe Campus default
+                    .zoom(13.5)
                     .build()
 
                 checkLocationPermission()

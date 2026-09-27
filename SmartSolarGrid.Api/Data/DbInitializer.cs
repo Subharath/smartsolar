@@ -131,6 +131,78 @@ namespace SmartSolarGrid.Api.Data
                         AvailableBatterySlots = 8,
                         OperationalSchedule = "08:30-17:30",
                         IsActive = true
+                    },
+                    new SolarStationInfo
+                    {
+                        StationCode = "SLIIT-01",
+                        HubName = "SLIIT Malabe Campus Microgrid",
+                        Latitude = 6.9147,
+                        Longitude = 79.9729,
+                        CapacityKwH = 250.0,
+                        TotalBatterySlots = 15,
+                        AvailableBatterySlots = 12,
+                        OperationalSchedule = "08:00-18:00",
+                        IsActive = true
+                    },
+                    new SolarStationInfo
+                    {
+                        StationCode = "PTG-01",
+                        HubName = "Pittugala Solar Substation Hub",
+                        Latitude = 6.9125,
+                        Longitude = 79.9650,
+                        CapacityKwH = 180.0,
+                        TotalBatterySlots = 10,
+                        AvailableBatterySlots = 8,
+                        OperationalSchedule = "08:30-17:30",
+                        IsActive = true
+                    },
+                    new SolarStationInfo
+                    {
+                        StationCode = "MLB-01",
+                        HubName = "Malabe Town Solar Node",
+                        Latitude = 6.9042,
+                        Longitude = 79.9547,
+                        CapacityKwH = 200.0,
+                        TotalBatterySlots = 12,
+                        AvailableBatterySlots = 10,
+                        OperationalSchedule = "08:00-18:00",
+                        IsActive = true
+                    },
+                    new SolarStationInfo
+                    {
+                        StationCode = "KDW-01",
+                        HubName = "Kaduwela Bus Stand Microgrid",
+                        Latitude = 6.9333,
+                        Longitude = 79.9833,
+                        CapacityKwH = 220.0,
+                        TotalBatterySlots = 14,
+                        AvailableBatterySlots = 11,
+                        OperationalSchedule = "07:30-19:00",
+                        IsActive = true
+                    },
+                    new SolarStationInfo
+                    {
+                        StationCode = "BTR-01",
+                        HubName = "Battaramulla Central Solar Hub",
+                        Latitude = 6.8990,
+                        Longitude = 79.9220,
+                        CapacityKwH = 300.0,
+                        TotalBatterySlots = 20,
+                        AvailableBatterySlots = 16,
+                        OperationalSchedule = "08:00-18:00",
+                        IsActive = true
+                    },
+                    new SolarStationInfo
+                    {
+                        StationCode = "GMP-01",
+                        HubName = "Gampaha Regional Solar Station",
+                        Latitude = 7.0897,
+                        Longitude = 79.9925,
+                        CapacityKwH = 160.0,
+                        TotalBatterySlots = 10,
+                        AvailableBatterySlots = 9,
+                        OperationalSchedule = "08:00-17:00",
+                        IsActive = true
                     }
                 };
                 await stationsCollection.InsertManyAsync(stations);
