@@ -110,8 +110,8 @@ class BookEnergySlot : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            // Construct booking ISO DateTime
-            val bookingCal = Calendar.getInstance().apply {
+            // Construct booking ISO DateTime in Sri Lanka (+05:30) Time
+            val bookingCal = Calendar.getInstance(TimeZone.getTimeZone("Asia/Colombo")).apply {
                 timeInMillis = cal.timeInMillis
                 set(Calendar.HOUR_OF_DAY, selectedHour)
                 set(Calendar.MINUTE, selectedMinute)

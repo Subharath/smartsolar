@@ -41,10 +41,15 @@ class BookingHistoryFragment : Fragment() {
 
     private fun loadHistory(rootView: View) {
         viewLifecycleOwner.lifecycleScope.launch {
+            val db = SolarGridDbHelper(requireContext())
+            if (db.getCachedStations().isEmpty()) {
+                try { ApiClient.getStations(requireContext()) } catch (_: Exception) {}
+            }
             val list = ApiClient.getMyReservations(requireContext())
             allHistoryBookings = list.filter {
                 it.status.equals("Completed", ignoreCase = true) ||
-                        it.status.equals("Cancelled", ignoreCase = true)
+                        it.status.equals("Cancelled", ignoreCase = true) ||
+                        it.status.equals("Rejected", ignoreCase = true)
             }
             renderHistory(rootView)
         }
@@ -76,17 +81,21 @@ class BookingHistoryFragment : Fragment() {
             return
         }
 
+        val stations = SolarGridDbHelper(requireContext()).getCachedStations()
         val inflater = LayoutInflater.from(requireContext())
         for (res in filtered) {
             val card = inflater.inflate(R.layout.item_booking_card, container, false)
 
-            card.findViewById<TextView>(R.id.cardStationTitle).text =
-                if (res.stationId.isNotEmpty()) "Station #${res.stationId.takeLast(6).uppercase()}" else "Solar Hub"
+            val stationName = stations.firstOrNull { it.id == res.stationId || it.stationCode == res.stationId }?.hubName
+                ?: if (res.stationId.isNotEmpty()) "Station #${res.stationId.takeLast(6).uppercase()}" else "Solar Hub"
 
-            card.findViewById<TextView>(R.id.cardScheduledDate).text =
-                res.scheduledDateTime.replace("T", " ").take(16)
+            card.findViewById<TextView>(R.id.cardStationTitle).text = stationName
+            card.findViewById<TextView>(R.id.cardScheduledDate).text = DateUtils.toSriLankaTime(res.scheduledDateTime)
 
-            card.findViewById<TextView>(R.id.cardStatusBadge).text = res.status
+            val badge = card.findViewById<TextView>(R.id.cardStatusBadge)
+            badge.text = res.status
+            badge.setBackgroundResource(R.drawable.today_badge)
+
             card.findViewById<TextView>(R.id.cardTimeSlot).text = "Status: ${res.status}"
             card.findViewById<TextView>(R.id.cardEnergy).text = "${res.energyAmountKwH} kWh"
             card.findViewById<TextView>(R.id.cardQrToken).text = "Token: ${res.qrPayloadToken}"

@@ -34,8 +34,8 @@ class BookingsFragment : Fragment() {
             findNavController().navigate(R.id.nav_home)
         }
 
-        tabActive = view.findViewById(R.id.bookingHistoryButton)
-        tabHistory = view.findViewById(R.id.pendingHistoryButton)
+        tabActive = view.findViewById(R.id.tabPendingRequestsButton)
+        tabHistory = view.findViewById(R.id.tabBookingHistoryButton)
         val searchInput = view.findViewById<android.widget.EditText>(R.id.bookingSearchInput)
 
         var lastQuery = ""

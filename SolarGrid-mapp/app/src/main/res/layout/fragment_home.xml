@@ -126,7 +126,7 @@
                 <ImageView
                     android:id="@+id/energyLeaves"
                     android:layout_width="130dp"
-                    android:layout_height="match_parent"
+                    android:layout_height="160dp"
                     android:layout_gravity="end|center_vertical"
                     android:layout_marginBottom="-10dp"
                     android:layout_marginEnd="-12dp"
@@ -256,7 +256,7 @@
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="88dp"
+                    android:layout_height="100dp"
                     android:layout_marginStart="6dp"
                     android:layout_marginTop="10dp"
                     android:layout_marginEnd="6dp"
@@ -296,7 +296,10 @@
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:orientation="vertical"
-                            android:padding="12dp"
+                            android:paddingTop="8dp"
+                            android:paddingBottom="8dp"
+                            android:paddingStart="4dp"
+                            android:paddingEnd="4dp"
                             android:gravity="center">
 
                             <!-- Count -->
@@ -307,7 +310,7 @@
                                 android:gravity="center"
                                 android:text="3"
                                 android:textColor="#F6C119"
-                                android:textSize="32sp"
+                                android:textSize="28sp"
                                 android:textStyle="bold"
                                 android:fontFamily="sans"
                                 android:includeFontPadding="false" />
@@ -320,10 +323,10 @@
                                 android:gravity="center"
                                 android:text="ACTIVE RESERVATIONS"
                                 android:textColor="#EAF7EE"
-                                android:textSize="10sp"
+                                android:textSize="9.5sp"
                                 android:textStyle="bold"
                                 android:fontFamily="sans"
-                                android:letterSpacing="0.08"
+                                android:letterSpacing="0.06"
                                 android:includeFontPadding="false" />
 
                         </LinearLayout>
@@ -364,7 +367,10 @@
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:orientation="vertical"
-                            android:padding="12dp"
+                            android:paddingTop="8dp"
+                            android:paddingBottom="8dp"
+                            android:paddingStart="4dp"
+                            android:paddingEnd="4dp"
                             android:gravity="center">
 
                             <!-- Count -->
@@ -375,7 +381,7 @@
                                 android:gravity="center"
                                 android:text="1"
                                 android:textColor="#F6C119"
-                                android:textSize="32sp"
+                                android:textSize="28sp"
                                 android:textStyle="bold"
                                 android:fontFamily="sans"
                                 android:includeFontPadding="false" />
@@ -388,10 +394,10 @@
                                 android:gravity="center"
                                 android:text="PENDING RESERVATIONS"
                                 android:textColor="#FFF4DF"
-                                android:textSize="10sp"
+                                android:textSize="9.5sp"
                                 android:textStyle="bold"
                                 android:fontFamily="sans"
-                                android:letterSpacing="0.08"
+                                android:letterSpacing="0.06"
                                 android:includeFontPadding="false" />
 
                         </LinearLayout>

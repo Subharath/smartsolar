@@ -58,6 +58,10 @@ class HomeFragment : Fragment() {
 
     private fun loadDashboardStats(rootView: View) {
         viewLifecycleOwner.lifecycleScope.launch {
+            val db = SolarGridDbHelper(requireContext())
+            if (db.getCachedStations().isEmpty()) {
+                try { ApiClient.getStations(requireContext()) } catch (_: Exception) {}
+            }
             val list = ApiClient.getMyReservations(requireContext())
             val activeCount = list.count { it.status.equals("Approved", ignoreCase = true) }
             val pendingCount = list.count { it.status.equals("Pending", ignoreCase = true) }
@@ -71,10 +75,13 @@ class HomeFragment : Fragment() {
             }
 
             if (latest != null) {
-                rootView.findViewById<TextView>(R.id.currentReservationName)?.text =
-                    if (latest.stationId.isNotEmpty()) "Station #${latest.stationId.takeLast(6).uppercase()}" else "Solar Hub"
+                val stations = SolarGridDbHelper(requireContext()).getCachedStations()
+                val stationName = stations.firstOrNull { it.id == latest.stationId || it.stationCode == latest.stationId }?.hubName
+                    ?: if (latest.stationId.isNotEmpty()) "Station #${latest.stationId.takeLast(6).uppercase()}" else "Solar Hub"
+
+                rootView.findViewById<TextView>(R.id.currentReservationName)?.text = stationName
                 rootView.findViewById<TextView>(R.id.currentReservationStatus)?.text = latest.status
-                rootView.findViewById<TextView>(R.id.currentReservationDistance)?.text = latest.scheduledDateTime.replace("T", " ").take(16)
+                rootView.findViewById<TextView>(R.id.currentReservationDistance)?.text = DateUtils.toSriLankaTime(latest.scheduledDateTime)
                 rootView.findViewById<TextView>(R.id.currentReservationCapacity)?.text =
                     "Allocated: ${latest.energyAmountKwH} kWh"
             } else {
