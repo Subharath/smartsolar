@@ -235,7 +235,7 @@ function ReservationsPage() {
       </Button>
 
       <div className="rounded-lg border border-solar/40 bg-solar/10 px-4 py-3 text-sm text-deepGreen">
-        <p className="font-medium">Reservation rules (shown for UX — enforced by API later)</p>
+        <p className="font-medium">Reservation rules (enforced by the API)</p>
         <ul className="list-disc ml-5 mt-1 space-y-0.5 text-gray-700">
           <li>Reservation must be within 7 days</li>
           <li>Updates / cancellations require at least 12 hours notice</li>
