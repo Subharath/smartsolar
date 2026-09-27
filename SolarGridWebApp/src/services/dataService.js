@@ -291,12 +291,24 @@ export async function getOperatorStats() {
       api.get('/Reservations').catch(() => []),
     ]);
 
+    const totalBatterySlots = nodes.reduce((sum, n) => sum + (n.batterySlots || 0), 0);
+    const availableSlots = nodes.reduce((sum, n) => sum + (n.availableSlots || 0), 0);
+    const occupiedSlots = Math.max(0, totalBatterySlots - availableSlots);
+
+    const pendingCount = reservations.filter((r) => r.status === 'Pending').length || metrics.pendingReservations || 0;
+    const currentCount = reservations.filter((r) => r.status === 'Approved' || r.status === 'Current').length || metrics.approvedFutureReservations || 0;
     const completedCount = reservations.filter((r) => r.status === 'Completed').length;
 
     return {
       totalNodes: nodes.length,
-      pendingReservations: metrics.pendingReservations || 0,
-      approvedReservations: metrics.approvedFutureReservations || 0,
+      pendingReservations: pendingCount,
+      pendingBookings: pendingCount,
+      currentBookings: currentCount,
+      approvedReservations: currentCount,
+      approvedFuture: currentCount,
+      availableSlots,
+      occupiedSlots,
+      totalSlots: totalBatterySlots,
       completedToday: completedCount,
     };
   } catch (err) {
@@ -304,7 +316,13 @@ export async function getOperatorStats() {
     return {
       totalNodes: 0,
       pendingReservations: 0,
+      pendingBookings: 0,
+      currentBookings: 0,
       approvedReservations: 0,
+      approvedFuture: 0,
+      availableSlots: 0,
+      occupiedSlots: 0,
+      totalSlots: 0,
       completedToday: 0,
     };
   }
