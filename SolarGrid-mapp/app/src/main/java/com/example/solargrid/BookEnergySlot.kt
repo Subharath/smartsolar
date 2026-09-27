@@ -179,7 +179,7 @@ class BookEnergySlot : AppCompatActivity() {
 
                     dialog.show()
                     dialog.window?.setLayout(
-                        (320 * resources.displayMetrics.density).toInt(),
+                        (resources.displayMetrics.widthPixels * 0.88).toInt().coerceAtMost((400 * resources.displayMetrics.density).toInt()),
                         WindowManager.LayoutParams.WRAP_CONTENT
                     )
                 } else {

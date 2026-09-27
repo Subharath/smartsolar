@@ -13,6 +13,9 @@ import kotlinx.coroutines.launch
 
 class BookingHistoryFragment : Fragment() {
 
+    private var allHistoryBookings: List<ApiClient.ReservationModel> = emptyList()
+    private var currentQuery: String = ""
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -31,47 +34,64 @@ class BookingHistoryFragment : Fragment() {
         view?.let { loadHistory(it) }
     }
 
-    private fun loadHistory(rootView: View) {
-        val container = rootView.findViewById<LinearLayout>(R.id.historyBookingsContainer) ?: return
+    fun updateSearchQuery(query: String) {
+        currentQuery = query.trim().lowercase()
+        view?.let { renderHistory(it) }
+    }
 
+    private fun loadHistory(rootView: View) {
         viewLifecycleOwner.lifecycleScope.launch {
             val list = ApiClient.getMyReservations(requireContext())
-            val historyList = list.filter {
+            allHistoryBookings = list.filter {
                 it.status.equals("Completed", ignoreCase = true) ||
                         it.status.equals("Cancelled", ignoreCase = true)
             }
+            renderHistory(rootView)
+        }
+    }
 
-            container.removeAllViews()
+    private fun renderHistory(rootView: View) {
+        val container = rootView.findViewById<LinearLayout>(R.id.historyBookingsContainer) ?: return
+        container.removeAllViews()
 
-            if (historyList.isEmpty()) {
-                val emptyTv = TextView(requireContext()).apply {
-                    text = "No previous booking history."
-                    setTextColor(android.graphics.Color.parseColor("#AFC7BC"))
-                    textSize = 14f
-                    gravity = Gravity.CENTER
-                    setPadding(32, 64, 32, 32)
-                }
-                container.addView(emptyTv)
-                return@launch
+        val filtered = allHistoryBookings.filter {
+            if (currentQuery.isEmpty()) true
+            else {
+                it.stationId.lowercase().contains(currentQuery) ||
+                it.qrPayloadToken.lowercase().contains(currentQuery) ||
+                it.status.lowercase().contains(currentQuery) ||
+                it.scheduledDateTime.lowercase().contains(currentQuery)
             }
+        }
 
-            val inflater = LayoutInflater.from(requireContext())
-            for (res in historyList) {
-                val card = inflater.inflate(R.layout.item_booking_card, container, false)
-
-                card.findViewById<TextView>(R.id.cardStationTitle).text =
-                    if (res.stationId.isNotEmpty()) "Station #${res.stationId.takeLast(6).uppercase()}" else "Solar Hub"
-
-                card.findViewById<TextView>(R.id.cardScheduledDate).text =
-                    res.scheduledDateTime.replace("T", " ").take(16)
-
-                card.findViewById<TextView>(R.id.cardStatusBadge).text = res.status
-                card.findViewById<TextView>(R.id.cardTimeSlot).text = "Status: ${res.status}"
-                card.findViewById<TextView>(R.id.cardEnergy).text = "${res.energyAmountKwH} kWh"
-                card.findViewById<TextView>(R.id.cardQrToken).text = "Token: ${res.qrPayloadToken}"
-
-                container.addView(card)
+        if (filtered.isEmpty()) {
+            val emptyTv = TextView(requireContext()).apply {
+                text = if (currentQuery.isNotEmpty()) "No matching booking history found." else "No previous booking history."
+                setTextColor(android.graphics.Color.parseColor("#AFC7BC"))
+                textSize = 14f
+                gravity = Gravity.CENTER
+                setPadding(32, 64, 32, 32)
             }
+            container.addView(emptyTv)
+            return
+        }
+
+        val inflater = LayoutInflater.from(requireContext())
+        for (res in filtered) {
+            val card = inflater.inflate(R.layout.item_booking_card, container, false)
+
+            card.findViewById<TextView>(R.id.cardStationTitle).text =
+                if (res.stationId.isNotEmpty()) "Station #${res.stationId.takeLast(6).uppercase()}" else "Solar Hub"
+
+            card.findViewById<TextView>(R.id.cardScheduledDate).text =
+                res.scheduledDateTime.replace("T", " ").take(16)
+
+            card.findViewById<TextView>(R.id.cardStatusBadge).text = res.status
+            card.findViewById<TextView>(R.id.cardTimeSlot).text = "Status: ${res.status}"
+            card.findViewById<TextView>(R.id.cardEnergy).text = "${res.energyAmountKwH} kWh"
+            card.findViewById<TextView>(R.id.cardQrToken).text = "Token: ${res.qrPayloadToken}"
+
+            container.addView(card)
         }
     }
 }

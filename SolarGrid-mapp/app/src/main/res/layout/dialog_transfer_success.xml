@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="320dp"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:gravity="center_horizontal"
@@ -29,7 +29,7 @@
         android:layout_marginTop="16dp"
         android:background="@drawable/bg_input"
         android:orientation="vertical"
-        android:padding="12dp">
+        android:padding="14dp">
 
         <TextView
             android:layout_width="wrap_content"
@@ -51,19 +51,19 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="API Request: POST /api/reservations/finalize-transfer"
-            android:textColor="#80FFFFFF"
-            android:textSize="10sp" />
+            android:layout_marginTop="10dp"
+            android:text="Status: Transfer Completed"
+            android:textColor="#00E676"
+            android:textSize="12sp"
+            android:textStyle="bold" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
-            android:text="Status: 200 OK (Transfer Completed)"
-            android:textColor="#00E676"
-            android:textSize="10sp"
-            android:textStyle="bold" />
+            android:text="Discharged &amp; recorded on Microgrid ledger"
+            android:textColor="#AAB5AE"
+            android:textSize="11sp" />
 
     </LinearLayout>
 

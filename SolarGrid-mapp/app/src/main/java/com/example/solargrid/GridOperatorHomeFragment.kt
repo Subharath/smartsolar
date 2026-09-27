@@ -43,6 +43,13 @@ class GridOperatorHomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        // Set dynamic operator greeting from SQLite session
+        val session = SolarGridDbHelper(requireContext()).getSession()
+        if (session != null) {
+            val firstName = session.name.split(" ").firstOrNull() ?: session.name
+            view.findViewById<TextView>(R.id.operatorNameGreeting)?.text = "$firstName,"
+        }
+
         // Nearby Stations Button -> Navigates to Grid Operator Power Station Selection Map
         view.findViewById<View>(R.id.nearbyStationsButton)?.setOnClickListener {
             val intent = Intent(requireContext(), GridOperatorPowerStationSelection::class.java)
@@ -92,7 +99,7 @@ class GridOperatorHomeFragment : Fragment() {
 
                 dialog.show()
                 dialog.window?.setLayout(
-                    (320 * resources.displayMetrics.density).toInt(),
+                    (resources.displayMetrics.widthPixels * 0.88).toInt().coerceAtMost((400 * resources.displayMetrics.density).toInt()),
                     WindowManager.LayoutParams.WRAP_CONTENT
                 )
             } else {

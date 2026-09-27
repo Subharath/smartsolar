@@ -17,6 +17,9 @@ import kotlinx.coroutines.launch
 
 class ActiveBookingsFragment : Fragment() {
 
+    private var allActiveBookings: List<ApiClient.ReservationModel> = emptyList()
+    private var currentQuery: String = ""
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -35,51 +38,68 @@ class ActiveBookingsFragment : Fragment() {
         view?.let { loadActiveBookings(it) }
     }
 
-    private fun loadActiveBookings(rootView: View) {
-        val container = rootView.findViewById<LinearLayout>(R.id.activeBookingsContainer) ?: return
+    fun updateSearchQuery(query: String) {
+        currentQuery = query.trim().lowercase()
+        view?.let { renderBookings(it) }
+    }
 
+    private fun loadActiveBookings(rootView: View) {
         viewLifecycleOwner.lifecycleScope.launch {
             val list = ApiClient.getMyReservations(requireContext())
-            val activeList = list.filter {
+            allActiveBookings = list.filter {
                 it.status.equals("Approved", ignoreCase = true) ||
                         it.status.equals("Pending", ignoreCase = true)
             }
+            renderBookings(rootView)
+        }
+    }
 
-            container.removeAllViews()
+    private fun renderBookings(rootView: View) {
+        val container = rootView.findViewById<LinearLayout>(R.id.activeBookingsContainer) ?: return
+        container.removeAllViews()
 
-            if (activeList.isEmpty()) {
-                val emptyTv = TextView(requireContext()).apply {
-                    text = "No active reservations.\nSelect a nearby station to book your energy slot."
-                    setTextColor(android.graphics.Color.parseColor("#AFC7BC"))
-                    textSize = 14f
-                    gravity = Gravity.CENTER
-                    setPadding(32, 64, 32, 32)
-                }
-                container.addView(emptyTv)
-                return@launch
+        val filtered = allActiveBookings.filter {
+            if (currentQuery.isEmpty()) true
+            else {
+                it.stationId.lowercase().contains(currentQuery) ||
+                it.qrPayloadToken.lowercase().contains(currentQuery) ||
+                it.status.lowercase().contains(currentQuery) ||
+                it.scheduledDateTime.lowercase().contains(currentQuery)
+            }
+        }
+
+        if (filtered.isEmpty()) {
+            val emptyTv = TextView(requireContext()).apply {
+                text = if (currentQuery.isNotEmpty()) "No matching active bookings found." else "No active reservations.\nSelect a nearby station to book your energy slot."
+                setTextColor(android.graphics.Color.parseColor("#AFC7BC"))
+                textSize = 14f
+                gravity = Gravity.CENTER
+                setPadding(32, 64, 32, 32)
+            }
+            container.addView(emptyTv)
+            return
+        }
+
+        val inflater = LayoutInflater.from(requireContext())
+        for (res in filtered) {
+            val card = inflater.inflate(R.layout.item_booking_card, container, false)
+
+            card.findViewById<TextView>(R.id.cardStationTitle).text =
+                if (res.stationId.isNotEmpty()) "Station #${res.stationId.takeLast(6).uppercase()}" else "Solar Hub"
+
+            card.findViewById<TextView>(R.id.cardScheduledDate).text =
+                res.scheduledDateTime.replace("T", " ").take(16)
+
+            card.findViewById<TextView>(R.id.cardStatusBadge).text = res.status
+            card.findViewById<TextView>(R.id.cardTimeSlot).text = "Status: ${res.status}"
+            card.findViewById<TextView>(R.id.cardEnergy).text = "${res.energyAmountKwH} kWh"
+            card.findViewById<TextView>(R.id.cardQrToken).text = "QR: ${res.qrPayloadToken}"
+
+            card.setOnClickListener {
+                showQrDialog(res.qrPayloadToken)
             }
 
-            val inflater = LayoutInflater.from(requireContext())
-            for (res in activeList) {
-                val card = inflater.inflate(R.layout.item_booking_card, container, false)
-
-                card.findViewById<TextView>(R.id.cardStationTitle).text =
-                    if (res.stationId.isNotEmpty()) "Station #${res.stationId.takeLast(6).uppercase()}" else "Solar Hub"
-
-                card.findViewById<TextView>(R.id.cardScheduledDate).text =
-                    res.scheduledDateTime.replace("T", " ").take(16)
-
-                card.findViewById<TextView>(R.id.cardStatusBadge).text = res.status
-                card.findViewById<TextView>(R.id.cardTimeSlot).text = "Status: ${res.status}"
-                card.findViewById<TextView>(R.id.cardEnergy).text = "${res.energyAmountKwH} kWh"
-                card.findViewById<TextView>(R.id.cardQrToken).text = "QR: ${res.qrPayloadToken}"
-
-                card.setOnClickListener {
-                    showQrDialog(res.qrPayloadToken)
-                }
-
-                container.addView(card)
-            }
+            container.addView(card)
         }
     }
 
@@ -115,7 +135,7 @@ class ActiveBookingsFragment : Fragment() {
 
         dialog.show()
         dialog.window?.setLayout(
-            (320 * resources.displayMetrics.density).toInt(),
+            (resources.displayMetrics.widthPixels * 0.88).toInt().coerceAtMost((400 * resources.displayMetrics.density).toInt()),
             WindowManager.LayoutParams.WRAP_CONTENT
         )
     }

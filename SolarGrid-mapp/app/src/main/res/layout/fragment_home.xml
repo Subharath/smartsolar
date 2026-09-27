@@ -115,7 +115,8 @@
             <FrameLayout
                 android:id="@+id/energyTransferCard"
                 android:layout_width="match_parent"
-                android:layout_height="160dp"
+                android:layout_height="wrap_content"
+                android:minHeight="160dp"
                 android:layout_marginStart="14dp"
                 android:layout_marginTop="40dp"
                 android:layout_marginEnd="14dp"
@@ -136,17 +137,16 @@
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:layout_marginLeft="10dp">
+                    android:padding="16dp">
 
                     <!-- Text -->
                     <TextView
                         android:id="@+id/energyTransferTitle"
-                        android:layout_width="190dp"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="16dp"
-                        android:layout_marginTop="16dp"
+                        android:layout_marginEnd="110dp"
                         android:text="Ready for your next&#10;energy transfer?"
                         android:textColor="@android:color/white"
                         android:textSize="20sp"
@@ -157,17 +157,16 @@
                     <View
                         android:layout_width="50dp"
                         android:layout_height="3dp"
-                        android:layout_marginStart="16dp"
-                        android:layout_marginTop="5dp"
+                        android:layout_marginTop="6dp"
                         android:background="#F6D400" />
 
                     <!-- Book Energy Slot button -->
                     <LinearLayout
                         android:id="@+id/bookEnergyButton"
-                        android:layout_width="200dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="52dp"
-                        android:layout_marginStart="12dp"
                         android:layout_marginTop="15dp"
+                        android:paddingEnd="16dp"
                         android:gravity="center_vertical"
                         android:orientation="horizontal"
                         android:background="@drawable/bg_energy_button"
@@ -491,12 +490,12 @@
                             android:id="@+id/currentReservationName"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Mahavali Sub"
+                            android:text="No Active Booking"
                             android:textColor="#FFFFFF"
                             android:textSize="14sp"
                             android:textStyle="bold" />
 
-                        <!-- Distance -->
+                        <!-- Distance / Time -->
                         <LinearLayout
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -516,7 +515,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="6dp"
-                                android:text="10 km Away"
+                                android:text="Tap above to reserve a slot"
                                 android:textColor="#D0D0D0"
                                 android:textSize="11sp" />
 
@@ -542,7 +541,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="6dp"
-                                android:text="Total Capacity 200 kW"
+                                android:text="Allocated: 0 kWh"
                                 android:textColor="#D0D0D0"
                                 android:textSize="11sp" />
 

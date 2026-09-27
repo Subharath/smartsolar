@@ -36,25 +36,51 @@ class BookingsFragment : Fragment() {
 
         tabActive = view.findViewById(R.id.bookingHistoryButton)
         tabHistory = view.findViewById(R.id.pendingHistoryButton)
+        val searchInput = view.findViewById<android.widget.EditText>(R.id.bookingSearchInput)
+
+        var lastQuery = ""
+
+        fun notifyChildQuery(query: String) {
+            val curFrag = childFragmentManager.findFragmentById(R.id.historyFragmentContainer)
+            if (curFrag is ActiveBookingsFragment) {
+                curFrag.updateSearchQuery(query)
+            } else if (curFrag is BookingHistoryFragment) {
+                curFrag.updateSearchQuery(query)
+            }
+        }
+
+        searchInput?.addTextChangedListener(object : android.text.TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                lastQuery = s?.toString() ?: ""
+                notifyChildQuery(lastQuery)
+            }
+            override fun afterTextChanged(s: android.text.Editable?) {}
+        })
 
         // Load default active bookings fragment
         if (savedInstanceState == null) {
+            val activeFrag = ActiveBookingsFragment()
             childFragmentManager.beginTransaction()
-                .replace(R.id.historyFragmentContainer, ActiveBookingsFragment())
+                .replace(R.id.historyFragmentContainer, activeFrag)
                 .commit()
         }
 
         tabActive.setOnClickListener {
             selectTab(true)
+            val frag = ActiveBookingsFragment()
             childFragmentManager.beginTransaction()
-                .replace(R.id.historyFragmentContainer, ActiveBookingsFragment())
+                .replace(R.id.historyFragmentContainer, frag)
+                .runOnCommit { frag.updateSearchQuery(lastQuery) }
                 .commit()
         }
 
         tabHistory.setOnClickListener {
             selectTab(false)
+            val frag = BookingHistoryFragment()
             childFragmentManager.beginTransaction()
-                .replace(R.id.historyFragmentContainer, BookingHistoryFragment())
+                .replace(R.id.historyFragmentContainer, frag)
+                .runOnCommit { frag.updateSearchQuery(lastQuery) }
                 .commit()
         }
     }

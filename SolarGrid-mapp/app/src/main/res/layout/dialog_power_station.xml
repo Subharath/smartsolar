@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="300dp"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:gravity="center_horizontal"
-    android:padding="12dp"
+    android:padding="16dp"
     android:background="@drawable/modal_bg">
 
     <!-- Station Name -->
@@ -14,17 +14,17 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:text="Mahavali Sub"
+        android:text="Microgrid Station"
         android:textColor="#FFD21C"
-        android:textSize="16sp"
+        android:textSize="18sp"
         android:textStyle="bold"
         android:fontFamily="sans" />
 
     <!-- Station Image -->
     <FrameLayout
-        android:layout_width="276dp"
-        android:layout_height="120dp"
-        android:layout_marginTop="8dp"
+        android:layout_width="match_parent"
+        android:layout_height="130dp"
+        android:layout_marginTop="10dp"
         android:background="@drawable/station_image_bg"
         android:clipChildren="true"
         android:clipToOutline="true">

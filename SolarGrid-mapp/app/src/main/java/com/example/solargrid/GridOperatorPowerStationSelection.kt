@@ -120,8 +120,10 @@ class GridOperatorPowerStationSelection : AppCompatActivity() {
 
                 dialog.show()
                 dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
-                dialog.window?.setGravity(Gravity.CENTER)
-                dialog.window?.setLayout(dpToPx(300), WindowManager.LayoutParams.WRAP_CONTENT)
+                dialog.window?.setLayout(
+                    (resources.displayMetrics.widthPixels * 0.88).toInt().coerceAtMost(dpToPx(420)),
+                    WindowManager.LayoutParams.WRAP_CONTENT
+                )
                 true
             }
 

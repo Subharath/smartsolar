@@ -133,7 +133,7 @@ class ProfileFragment : Fragment() {
 
         dialog.show()
         dialog.window?.setLayout(
-            (300 * resources.displayMetrics.density).toInt(),
+            (resources.displayMetrics.widthPixels * 0.88).toInt().coerceAtMost((400 * resources.displayMetrics.density).toInt()),
             WindowManager.LayoutParams.WRAP_CONTENT
         )
     }
@@ -169,7 +169,7 @@ class ProfileFragment : Fragment() {
 
         dialog.show()
         dialog.window?.setLayout(
-            (300 * resources.displayMetrics.density).toInt(),
+            (resources.displayMetrics.widthPixels * 0.88).toInt().coerceAtMost((400 * resources.displayMetrics.density).toInt()),
             WindowManager.LayoutParams.WRAP_CONTENT
         )
     }

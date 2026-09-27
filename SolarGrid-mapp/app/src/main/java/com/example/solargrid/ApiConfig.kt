@@ -12,8 +12,8 @@ object ApiConfig {
     private const val PREFS_NAME = "solargrid_api_prefs"
     private const val KEY_BASE_URL = "base_url"
 
-    // Default port 5025 matches ASP.NET Core API launchSettings.json
-    private const val DEFAULT_BASE_URL = "http://10.0.2.2:5025/api/"
+    // Default to current LAN IP so physical devices on Wi-Fi connect instantly without manual setup
+    private const val DEFAULT_BASE_URL = "http://10.19.154.53:5025/api/"
 
     fun getBaseUrl(context: Context): String {
         val prefs: SharedPreferences = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)

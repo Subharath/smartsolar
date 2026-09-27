@@ -128,8 +128,10 @@ class PowerStationSelection : AppCompatActivity() {
                 dialog.show()
                 val window = dialog.window
                 window?.setBackgroundDrawableResource(android.R.color.transparent)
-                window?.setGravity(Gravity.CENTER)
-                window?.setLayout(dpToPx(300), WindowManager.LayoutParams.WRAP_CONTENT)
+                window?.setLayout(
+                    (resources.displayMetrics.widthPixels * 0.88).toInt().coerceAtMost(dpToPx(420)),
+                    WindowManager.LayoutParams.WRAP_CONTENT
+                )
                 true
             }
 

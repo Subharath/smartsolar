@@ -74,8 +74,14 @@ class HomeFragment : Fragment() {
                 rootView.findViewById<TextView>(R.id.currentReservationName)?.text =
                     if (latest.stationId.isNotEmpty()) "Station #${latest.stationId.takeLast(6).uppercase()}" else "Solar Hub"
                 rootView.findViewById<TextView>(R.id.currentReservationStatus)?.text = latest.status
+                rootView.findViewById<TextView>(R.id.currentReservationDistance)?.text = latest.scheduledDateTime.replace("T", " ").take(16)
                 rootView.findViewById<TextView>(R.id.currentReservationCapacity)?.text =
                     "Allocated: ${latest.energyAmountKwH} kWh"
+            } else {
+                rootView.findViewById<TextView>(R.id.currentReservationName)?.text = "No Active Booking"
+                rootView.findViewById<TextView>(R.id.currentReservationStatus)?.text = "None"
+                rootView.findViewById<TextView>(R.id.currentReservationDistance)?.text = "Tap above to reserve a slot"
+                rootView.findViewById<TextView>(R.id.currentReservationCapacity)?.text = "Allocated: 0 kWh"
             }
         }
     }

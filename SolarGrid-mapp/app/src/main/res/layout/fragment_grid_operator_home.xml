@@ -70,9 +70,10 @@
                             android:textStyle="bold" />
 
                         <TextView
+                            android:id="@+id/operatorNameGreeting"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Sankalpa,"
+                            android:text="Operator,"
                             android:textColor="#00B565"
                             android:textSize="25sp"
                             android:textStyle="bold" />
@@ -111,7 +112,8 @@
             <FrameLayout
                 android:id="@+id/scanQrCard"
                 android:layout_width="match_parent"
-                android:layout_height="175dp"
+                android:layout_height="wrap_content"
+                android:minHeight="175dp"
                 android:layout_marginStart="14dp"
                 android:layout_marginTop="36dp"
                 android:layout_marginEnd="14dp"
@@ -132,14 +134,15 @@
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:padding="16dp">
 
                     <!-- Headline -->
                     <TextView
-                        android:layout_width="220dp"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginEnd="110dp"
                         android:text="Verify a prosumer's energy transfer by scanning their transaction QR code"
                         android:textColor="@android:color/white"
                         android:textSize="16sp"
@@ -156,9 +159,10 @@
                     <!-- Scan QR Code button -->
                     <LinearLayout
                         android:id="@+id/scanQrButton"
-                        android:layout_width="210dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="50dp"
                         android:layout_marginTop="16dp"
+                        android:paddingEnd="16dp"
                         android:gravity="center_vertical"
                         android:orientation="horizontal"
                         android:background="@drawable/bg_energy_button"
@@ -204,7 +208,8 @@
             <FrameLayout
                 android:id="@+id/nearbyStationsCard"
                 android:layout_width="match_parent"
-                android:layout_height="175dp"
+                android:layout_height="wrap_content"
+                android:minHeight="175dp"
                 android:layout_marginStart="14dp"
                 android:layout_marginTop="20dp"
                 android:layout_marginEnd="14dp"
@@ -222,14 +227,15 @@
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:padding="16dp">
 
                     <!-- Headline -->
                     <TextView
-                        android:layout_width="200dp"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginEnd="110dp"
                         android:text="View nearby stations on map and check operational details"
                         android:textColor="@android:color/white"
                         android:textSize="16sp"
@@ -246,9 +252,10 @@
                     <!-- Nearby Stations button -->
                     <LinearLayout
                         android:id="@+id/nearbyStationsButton"
-                        android:layout_width="210dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="50dp"
                         android:layout_marginTop="16dp"
+                        android:paddingEnd="16dp"
                         android:gravity="center_vertical"
                         android:orientation="horizontal"
                         android:background="@drawable/bg_outline_button"

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="300dp"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:gravity="center_horizontal"
@@ -13,7 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:text="Mahavali Substation"
+        android:text="Microgrid Station"
         android:textColor="#FFD21C"
         android:textSize="18sp"
         android:textStyle="bold"
@@ -21,8 +21,8 @@
 
     <!-- Station Image -->
     <FrameLayout
-        android:layout_width="268dp"
-        android:layout_height="125dp"
+        android:layout_width="match_parent"
+        android:layout_height="130dp"
         android:layout_marginTop="12dp"
         android:background="@drawable/station_image_bg"
         android:clipChildren="true"
