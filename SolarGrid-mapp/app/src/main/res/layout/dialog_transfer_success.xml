@@ -43,7 +43,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:text="SOLAR-TX-A1B2C3D4E5F6"
+            android:text=""
             android:textColor="#F2C300"
             android:textSize="14sp"
             android:textStyle="bold" />
