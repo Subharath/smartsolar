@@ -344,41 +344,72 @@ function OperatorDashboard() {
 
       {/* ── 2. KPI Cards ─────────────────────────────────── */}
       <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-5 gap-4">
+
+        {/* Pending Bookings — planner + hourglass + clock */}
         <StatCard
           title="Pending Bookings"
           value={stats?.pendingBookings ?? 0}
-          icon={<IconSm><BookingIcon className="w-5 h-5" /></IconSm>}
-          accent="solar"
+          icon={<IconSm><BookingIcon className="w-4 h-4" /></IconSm>}
           subtitle="Awaiting review"
+          backgroundImage="https://images.unsplash.com/photo-1783099779460-0eec56bbc6be?auto=format&fit=crop&w=1200&q=80"
+          overlay="linear-gradient(160deg, rgba(3,42,28,0.76) 0%, rgba(8,60,40,0.58) 50%, rgba(0,18,10,0.34) 100%)"
+          iconAccentColor="#FFC400"
+          numAccentColor="#FFC400"
+          bgPosition="center 30%"
         />
+
+        {/* Current Bookings — laptop with digital calendar */}
         <StatCard
           title="Current Bookings"
           value={stats?.currentBookings ?? 0}
-          icon={<IconSm><BookingIcon className="w-5 h-5" /></IconSm>}
-          accent="green"
+          icon={<IconSm><BookingIcon className="w-4 h-4" /></IconSm>}
           subtitle="Active right now"
+          backgroundImage="https://images.unsplash.com/photo-1771054243991-e7b2d194ac96?auto=format&fit=crop&w=1200&q=80"
+          overlay="linear-gradient(160deg, rgba(2,38,24,0.77) 0%, rgba(5,65,44,0.57) 52%, rgba(0,22,12,0.32) 100%)"
+          iconAccentColor="#00E897"
+          numAccentColor="#00E897"
+          bgPosition="center 40%"
         />
+
+        {/* Approved Future — open planner/calendar */}
         <StatCard
           title="Approved Future"
           value={stats?.approvedFuture ?? 0}
-          icon={<IconSm><BookingIcon className="w-5 h-5" /></IconSm>}
-          accent="leafLight"
+          icon={<IconSm><BookingIcon className="w-4 h-4" /></IconSm>}
           subtitle="Scheduled ahead"
+          backgroundImage="https://images.unsplash.com/photo-1787062421104-ef07371ef394?auto=format&fit=crop&w=1200&q=80"
+          overlay="linear-gradient(160deg, rgba(3,40,26,0.76) 0%, rgba(6,62,42,0.56) 52%, rgba(0,20,10,0.32) 100%)"
+          iconAccentColor="#6EE7B7"
+          numAccentColor="#6EE7B7"
+          bgPosition="center 35%"
         />
+
+        {/* Available Slots — aerial solar farm */}
         <StatCard
           title="Available Slots"
           value={stats?.availableSlots ?? 0}
-          icon={<IconSm><NodeIcon className="w-5 h-5" /></IconSm>}
-          accent="energy"
+          icon={<IconSm><NodeIcon className="w-4 h-4" /></IconSm>}
           subtitle="Ready to book"
+          backgroundImage="https://images.unsplash.com/photo-1770936994282-8811fb7129ac?auto=format&fit=crop&w=1200&q=80"
+          overlay="linear-gradient(160deg, rgba(2,35,22,0.74) 0%, rgba(4,58,38,0.53) 52%, rgba(0,16,8,0.30) 100%)"
+          iconAccentColor="#34D399"
+          numAccentColor="#34D399"
+          bgPosition="center 55%"
         />
+
+        {/* Occupied Slots — electrical substation / active grid */}
         <StatCard
           title="Occupied Slots"
           value={stats?.occupiedSlots ?? 0}
-          icon={<IconSm><NodeIcon className="w-5 h-5" /></IconSm>}
-          accent="dark"
+          icon={<IconSm><NodeIcon className="w-4 h-4" /></IconSm>}
           subtitle="Currently in use"
+          backgroundImage="https://images.unsplash.com/photo-1780396140802-52309c205050?auto=format&fit=crop&w=1200&q=80"
+          overlay="linear-gradient(160deg, rgba(3,30,20,0.77) 0%, rgba(5,50,34,0.58) 52%, rgba(0,14,8,0.35) 100%)"
+          iconAccentColor="#FFC400"
+          numAccentColor="#FFC400"
+          bgPosition="center 45%"
         />
+
       </div>
 
       {/* ── 3. Slot Utilization + Node Status ────────────── */}
