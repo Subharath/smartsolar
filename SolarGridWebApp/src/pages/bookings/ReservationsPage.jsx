@@ -24,6 +24,8 @@ import {
   reservationWithin7Days,
   atLeast12HoursNotice,
 } from '../../utils/validation';
+import { useToast } from '../../context/ToastContext';
+import { extractErrorMessage } from '../../utils/errorUtils';
 
 const emptyForm = {
   prosumerId: '',
@@ -34,6 +36,7 @@ const emptyForm = {
 };
 
 function ReservationsPage() {
+  const toast = useToast();
   const [reservations, setReservations] = useState([]);
   const [prosumers, setProsumers] = useState([]);
   const [nodes, setNodes] = useState([]);
@@ -149,13 +152,15 @@ function ReservationsPage() {
 
       if (editing) {
         await updateReservation(editing.id, payload);
+        toast.success('Reservation updated successfully', 'The reservation changes have been saved.');
       } else {
         await createReservation(payload);
+        toast.success('Reservation created successfully', 'The new reservation has been saved.');
       }
       setModalOpen(false);
       await loadAll();
     } catch (err) {
-      setError(err.message || 'Failed to save reservation.');
+      toast.error(editing ? 'Failed to update reservation' : 'Failed to create reservation', extractErrorMessage(err));
     } finally {
       setSaving(false);
     }
@@ -169,17 +174,18 @@ function ReservationsPage() {
   async function handleCancel() {
     if (!cancelTarget) return;
     if (cancelTarget.notice) {
-      setError(cancelTarget.notice);
+      toast.error('Cannot cancel reservation', cancelTarget.notice);
       setCancelTarget(null);
       return;
     }
     setSaving(true);
     try {
       await cancelReservation(cancelTarget.item.id);
+      toast.success('Reservation cancelled', 'The reservation has been cancelled successfully.');
       setCancelTarget(null);
       await loadAll();
     } catch (err) {
-      setError(err.message || 'Failed to cancel reservation.');
+      toast.error('Failed to cancel reservation', extractErrorMessage(err));
     } finally {
       setSaving(false);
     }
@@ -222,6 +228,11 @@ function ReservationsPage() {
   return (
     <div className="space-y-4">
       <ErrorMessage message={error} onRetry={loadAll} />
+
+      {/* Temporary Test Button */}
+      <Button onClick={() => toast.success("Toast test", "If you can see this, the global toast system is working.")}>
+        Test Toast
+      </Button>
 
       <div className="rounded-lg border border-solar/40 bg-solar/10 px-4 py-3 text-sm text-deepGreen">
         <p className="font-medium">Reservation rules (shown for UX — enforced by API later)</p>

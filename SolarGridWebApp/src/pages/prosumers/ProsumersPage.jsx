@@ -16,11 +16,14 @@ import {
   updateProsumer,
   setProsumerStatus,
 } from '../../services/dataService';
+import { useToast } from '../../context/ToastContext';
+import { extractErrorMessage } from '../../utils/errorUtils';
 import { required, emailFormat } from '../../utils/validation';
 
 const emptyForm = { name: '', nic: '', email: '', phone: '', address: '' };
 
 function ProsumersPage() {
+  const toast = useToast();
   const [prosumers, setProsumers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -106,13 +109,15 @@ function ProsumersPage() {
       };
       if (editing) {
         await updateProsumer(editing.id, payload);
+        toast.success('Prosumer updated successfully', 'The prosumer has been updated.');
       } else {
         await createProsumer(payload);
+        toast.success('Prosumer created successfully', 'The new prosumer has been added.');
       }
       setModalOpen(false);
       await loadProsumers();
     } catch (err) {
-      setError(err.message || 'Failed to save prosumer.');
+      toast.error(editing ? 'Failed to update prosumer' : 'Failed to create prosumer', extractErrorMessage(err));
     } finally {
       setSaving(false);
     }
@@ -123,10 +128,11 @@ function ProsumersPage() {
     setSaving(true);
     try {
       await setProsumerStatus(confirm.item.id, confirm.nextStatus);
+      toast.success('Status updated', `Prosumer status changed to ${confirm.nextStatus}.`);
       setConfirm(null);
       await loadProsumers();
     } catch (err) {
-      setError(err.message || 'Failed to update status.');
+      toast.error('Failed to update status', extractErrorMessage(err));
     } finally {
       setSaving(false);
     }

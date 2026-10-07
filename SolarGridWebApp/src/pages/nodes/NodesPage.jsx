@@ -11,6 +11,8 @@ import ErrorMessage from '../../components/common/ErrorMessage';
 import DataTable from '../../components/tables/DataTable';
 import { PlusIcon, EditIcon } from '../../components/common/Icons';
 import { getNodes, createNode, updateNode, setNodeStatus } from '../../services/dataService';
+import { useToast } from '../../context/ToastContext';
+import { extractErrorMessage } from '../../utils/errorUtils';
 import {
   required,
   isPositiveNumber,
@@ -29,6 +31,7 @@ const emptyForm = {
 };
 
 function NodesPage() {
+  const toast = useToast();
   const [nodes, setNodes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -124,13 +127,15 @@ function NodesPage() {
       };
       if (editing) {
         await updateNode(editing.id, payload);
+        toast.success('Node updated successfully', 'The node has been updated.');
       } else {
         await createNode(payload);
+        toast.success('Node created successfully', 'The new node has been added.');
       }
       setModalOpen(false);
       await loadNodes();
     } catch (err) {
-      setError(err.message || 'Failed to save node.');
+      toast.error(editing ? 'Failed to update node' : 'Failed to create node', extractErrorMessage(err));
     } finally {
       setSaving(false);
     }
@@ -141,10 +146,11 @@ function NodesPage() {
     setSaving(true);
     try {
       await setNodeStatus(confirm.id, 'Inactive');
+      toast.success('Node deactivated', `Node "${confirm.name}" has been deactivated.`);
       setConfirm(null);
       await loadNodes();
     } catch (err) {
-      setError(err.message || 'Failed to deactivate node.');
+      toast.error('Failed to deactivate node', extractErrorMessage(err));
     } finally {
       setSaving(false);
     }

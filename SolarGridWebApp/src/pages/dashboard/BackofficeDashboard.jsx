@@ -50,31 +50,31 @@ function BackofficeDashboard() {
       <ErrorMessage message={error} onRetry={loadData} />
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard 
-          title="Total Users" 
-          value={stats?.totalUsers ?? 0} 
-          icon={<span className="w-5 h-5 flex items-center justify-center"><UsersIcon /></span>} 
+        <StatCard
+          title="Total Users"
+          value={stats?.totalUsers ?? 0}
+          icon={<span className="w-5 h-5 flex items-center justify-center"><UsersIcon /></span>}
           backgroundImage="https://images.unsplash.com/photo-1521737711867-e3b97375f902?auto=format&fit=crop&w=1200&q=80"
           overlay="linear-gradient(135deg, rgba(3,45,35,0.65), rgba(5,70,50,0.45), rgba(0,0,0,0.20))"
         />
-        <StatCard 
-          title="Total Prosumers" 
-          value={stats?.totalProsumers ?? 0} 
-          icon={<span className="w-5 h-5 flex items-center justify-center"><ProsumerIcon /></span>} 
+        <StatCard
+          title="Total Prosumers"
+          value={stats?.totalProsumers ?? 0}
+          icon={<span className="w-5 h-5 flex items-center justify-center"><ProsumerIcon /></span>}
           backgroundImage="https://images.unsplash.com/photo-1509391366360-2e959784a276?auto=format&fit=crop&w=1200&q=80"
           overlay="linear-gradient(135deg, rgba(3,45,35,0.65), rgba(5,70,50,0.45), rgba(0,0,0,0.20))"
         />
-        <StatCard 
-          title="Microgrid Nodes" 
-          value={stats?.totalNodes ?? 0} 
-          icon={<span className="w-5 h-5 flex items-center justify-center"><NodeIcon /></span>} 
+        <StatCard
+          title="Microgrid Nodes"
+          value={stats?.totalNodes ?? 0}
+          icon={<span className="w-5 h-5 flex items-center justify-center"><NodeIcon /></span>}
           backgroundImage="https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?auto=format&fit=crop&w=1200&q=80"
           overlay="linear-gradient(135deg, rgba(3,45,35,0.65), rgba(5,70,50,0.45), rgba(0,0,0,0.20))"
         />
-        <StatCard 
-          title="Pending Reservations" 
-          value={stats?.pendingReservations ?? 0} 
-          icon={<span className="w-5 h-5 flex items-center justify-center"><BookingIcon /></span>} 
+        <StatCard
+          title="Pending Reservations"
+          value={stats?.pendingReservations ?? 0}
+          icon={<span className="w-5 h-5 flex items-center justify-center"><BookingIcon /></span>}
           backgroundImage="https://images.unsplash.com/photo-1506784983877-45594efa4cbe?auto=format&fit=crop&w=1200&q=80"
           overlay="linear-gradient(135deg, rgba(3,45,35,0.65), rgba(5,70,50,0.45), rgba(0,0,0,0.20))"
         />

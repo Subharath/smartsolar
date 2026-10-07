@@ -12,11 +12,14 @@ import ErrorMessage from '../../components/common/ErrorMessage';
 import DataTable from '../../components/tables/DataTable';
 import { PlusIcon, EditIcon } from '../../components/common/Icons';
 import { getUsers, createUser, updateUser, setUserStatus } from '../../services/dataService';
+import { useToast } from '../../context/ToastContext';
+import { extractErrorMessage } from '../../utils/errorUtils';
 import { required, emailFormat } from '../../utils/validation';
 
 const emptyForm = { name: '', email: '', role: '', password: '' };
 
 function UsersPage() {
+  const toast = useToast();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -93,13 +96,15 @@ function UsersPage() {
       const payload = { name: form.name.trim(), email: form.email.trim(), role: form.role };
       if (editing) {
         await updateUser(editing.id, payload);
+        toast.success('User updated successfully', 'The user has been updated.');
       } else {
         await createUser({ ...payload, password: form.password });
+        toast.success('User created successfully', 'The new user has been added.');
       }
       setModalOpen(false);
       await loadUsers();
     } catch (err) {
-      setError(err.message || 'Failed to save user.');
+      toast.error(editing ? 'Failed to update user' : 'Failed to create user', extractErrorMessage(err));
     } finally {
       setSaving(false);
     }
@@ -110,10 +115,11 @@ function UsersPage() {
     setSaving(true);
     try {
       await setUserStatus(confirm.user.id, confirm.nextStatus);
+      toast.success('Status updated', `User status changed to ${confirm.nextStatus}.`);
       setConfirm(null);
       await loadUsers();
     } catch (err) {
-      setError(err.message || 'Failed to update status.');
+      toast.error('Failed to update status', extractErrorMessage(err));
     } finally {
       setSaving(false);
     }
