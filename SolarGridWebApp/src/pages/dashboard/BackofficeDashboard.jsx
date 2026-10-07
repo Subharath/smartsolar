@@ -57,26 +57,6 @@ function BackofficeDashboard() {
       </div>
 
       <Card
-        title="Quick Actions"
-        actions={null}
-      >
-        <div className="flex flex-wrap gap-3">
-          <Link to="/backoffice/users">
-            <Button variant="secondary" size="sm"><PlusIcon className="w-4 h-4" /> Manage Users</Button>
-          </Link>
-          <Link to="/backoffice/prosumers">
-            <Button variant="primary" size="sm"><PlusIcon className="w-4 h-4" /> Manage Prosumers</Button>
-          </Link>
-          <Link to="/backoffice/nodes">
-            <Button variant="outline" size="sm"><PlusIcon className="w-4 h-4" /> Manage Nodes</Button>
-          </Link>
-          <Link to="/backoffice/reservations">
-            <Button variant="accent" size="sm"><PlusIcon className="w-4 h-4" /> Reservations</Button>
-          </Link>
-        </div>
-      </Card>
-
-      <Card
         title="Recent Reservations"
         actions={
           <Link to="/backoffice/reservations">
