@@ -12,6 +12,7 @@ import ReservationsPage from "../pages/bookings/ReservationsPage";
 import OperatorBookingsPage from "../pages/bookings/OperatorBookingsPage";
 import OperatorNodesPage from "../pages/nodes/OperatorNodesPage";
 import LoadingSpinner from "../components/common/LoadingSpinner";
+import NotFoundPage from "../pages/NotFoundPage";
 
 
 function HomeRedirect() {
@@ -76,7 +77,7 @@ function AppRoutes() {
           </Route>
         </Route>
 
-        <Route path="*" element={<HomeRedirect />} />
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </>
   );
