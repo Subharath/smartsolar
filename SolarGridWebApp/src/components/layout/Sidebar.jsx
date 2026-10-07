@@ -1,5 +1,7 @@
+import { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import LogoutConfirmModal from '../common/LogoutConfirmModal';
 import {
   DashboardIcon,
   UsersIcon,
@@ -27,6 +29,7 @@ const operatorLinks = [
 
 function Sidebar({ open, onClose }) {
   const { user, logout, isBackoffice } = useAuth();
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
   const links = isBackoffice ? backofficeLinks : operatorLinks;
 
   const initials = user?.name
@@ -172,7 +175,7 @@ function Sidebar({ open, onClose }) {
           {/* Logout button */}
           <button
             type="button"
-            onClick={logout}
+            onClick={() => setIsLogoutModalOpen(true)}
             className="
               w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl
               text-sm font-medium transition-all duration-150
@@ -196,6 +199,12 @@ function Sidebar({ open, onClose }) {
           </button>
         </div>
       </aside>
+
+      <LogoutConfirmModal 
+        isOpen={isLogoutModalOpen}
+        onClose={() => setIsLogoutModalOpen(false)}
+        onConfirm={logout}
+      />
     </>
   );
 }
