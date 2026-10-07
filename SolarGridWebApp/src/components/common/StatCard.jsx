@@ -66,50 +66,26 @@ function PhotoStatCard({
   subtitle,
   backgroundImage,
   overlay = 'linear-gradient(160deg, rgba(3,42,30,0.92) 0%, rgba(5,68,48,0.72) 50%, rgba(0,20,14,0.55) 100%)',
-  iconAccentColor = '#FFC400',
+  iconAccentColor = '#ffffff',
   numAccentColor  = '#ffffff',
   bgPosition      = 'center',
 }) {
   return (
     <div
-      className="relative overflow-hidden rounded-2xl transition-all duration-250 group"
+      className="relative overflow-hidden rounded-2xl hover:-translate-y-1 hover:shadow-xl transition-all duration-300 h-full w-full flex flex-col justify-end"
       style={{
         minHeight:           '155px',
         backgroundImage:     `${overlay}, url("${backgroundImage}")`,
         backgroundSize:      'cover',
         backgroundPosition:  bgPosition,
         backgroundRepeat:    'no-repeat',
-        border:              '1px solid rgba(255,255,255,0.10)',
-        boxShadow:           '0 2px 12px rgba(0,0,0,0.22), 0 1px 4px rgba(0,0,0,0.14)',
-        cursor:              'default',
-        /* image zoom anchor */
-        backgroundAttachment: 'scroll',
-      }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.transform = 'translateY(-3px)';
-        e.currentTarget.style.boxShadow =
-          '0 8px 28px rgba(0,0,0,0.32), 0 2px 8px rgba(0,0,0,0.18)';
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.transform = 'translateY(0)';
-        e.currentTarget.style.boxShadow =
-          '0 2px 12px rgba(0,0,0,0.22), 0 1px 4px rgba(0,0,0,0.14)';
       }}
     >
-      {/* ── Small glass icon – top-right ─────────────────── */}
+      {/* ── Small glass icon – top-left ─────────────────── */}
       {icon && (
         <div
-          className="absolute top-4 right-4 flex items-center justify-center rounded-xl"
-          style={{
-            width:           '38px',
-            height:          '38px',
-            background:      'rgba(255,255,255,0.08)',
-            backdropFilter:  'blur(8px)',
-            WebkitBackdropFilter: 'blur(8px)',
-            border:          '1px solid rgba(255,255,255,0.16)',
-            color:           iconAccentColor,
-            boxShadow:       '0 1px 4px rgba(0,0,0,0.20)',
-          }}
+          className="absolute top-4 left-4 flex items-center justify-center rounded-xl w-9 h-9 bg-black/25 backdrop-blur-md border border-white/20"
+          style={{ color: iconAccentColor }}
           aria-hidden="true"
         >
           {icon}
@@ -117,15 +93,10 @@ function PhotoStatCard({
       )}
 
       {/* ── KPI text – bottom-left ───────────────────────── */}
-      <div
-        className="absolute bottom-0 left-0 right-0 px-5 pb-5 pt-10"
-        style={{
-          background: 'linear-gradient(to top, rgba(2,28,20,0.70) 0%, transparent 100%)',
-        }}
-      >
+      <div className="relative px-5 pb-5 pt-10 mt-auto">
         {/* Big number */}
         <p
-          className="font-bold leading-none"
+          className="font-bold leading-none text-white"
           style={{
             fontSize:    '2.25rem',
             color:       numAccentColor,
@@ -138,10 +109,9 @@ function PhotoStatCard({
 
         {/* Card title */}
         <p
-          className="font-semibold mt-1"
+          className="font-semibold mt-1 text-white"
           style={{
             fontSize:   '0.9375rem',
-            color:      '#ffffff',
             textShadow: '0 1px 4px rgba(0,0,0,0.35)',
           }}
         >
@@ -151,10 +121,9 @@ function PhotoStatCard({
         {/* Subtitle */}
         {subtitle && (
           <p
-            className="mt-0.5"
+            className="mt-0.5 text-white/80"
             style={{
               fontSize:   '0.75rem',
-              color:      'rgba(255,255,255,0.72)',
               textShadow: '0 1px 3px rgba(0,0,0,0.30)',
             }}
           >
