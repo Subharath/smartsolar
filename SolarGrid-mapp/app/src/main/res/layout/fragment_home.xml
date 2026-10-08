@@ -1,0 +1,383 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- Full screen background -->
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:src="@drawable/dashboardbg"
+        android:contentDescription="@null" />
+
+
+
+    <!-- Scrollable dashboard content -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingBottom="30dp">
+
+            <!-- ========================= -->
+            <!-- HEADER -->
+            <!-- ========================= -->
+
+            <FrameLayout
+                android:id="@+id/dashboardHeader"
+                android:layout_width="match_parent"
+                android:layout_height="125dp"
+                android:background="@drawable/bg_header"
+                android:clipToOutline="true">
+
+                <!-- Profile circle -->
+                <ImageView
+                    android:id="@+id/profileImage"
+                    android:layout_width="70dp"
+                    android:layout_height="70dp"
+                    android:layout_marginStart="18dp"
+                    android:layout_marginTop="40dp"
+                    android:padding="7dp"
+                    android:src="@drawable/user"
+                    android:contentDescription="Profile" />
+
+                <!-- Greeting -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="100dp"
+                    android:layout_marginTop="48dp"
+                    android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Hi"
+                        android:textColor="@android:color/white"
+                        android:layout_marginRight="10dp"
+                        android:textSize="25sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Sankalpa,"
+                        android:textColor="#00B565"
+                        android:textSize="25sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Welcome!"
+                        android:textColor="@android:color/white"
+                        android:textSize="15sp"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+
+                <!-- Notification -->
+                <ImageView
+                    android:id="@+id/notificationButton"
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
+                    android:layout_gravity="end"
+                    android:layout_marginTop="48dp"
+                    android:layout_marginEnd="14dp"
+                    android:background="@android:color/transparent"
+                    android:padding="8dp"
+                    android:src="@drawable/notification"
+                    android:contentDescription="Notifications" />
+
+            </FrameLayout>
+
+
+            <!-- ========================= -->
+            <!-- PRIMARY CTA CARD -->
+            <!-- ========================= -->
+
+            <FrameLayout
+                android:id="@+id/energyTransferCard"
+                android:layout_width="match_parent"
+                android:layout_height="145dp"
+                android:layout_marginStart="14dp"
+                android:layout_marginTop="40dp"
+                android:layout_marginEnd="14dp"
+                android:background="@drawable/bg_energy_card">
+
+                <!-- Decorative leaves -->
+                <ImageView
+                    android:id="@+id/energyLeaves"
+                    android:layout_width="140dp"
+                    android:layout_height="140dp"
+                    android:layout_gravity="end|center_vertical"
+                    android:layout_marginBottom="-10dp"
+                    android:layout_marginEnd="-5dp"
+                    android:scaleType="fitCenter"
+                    android:alpha="0.40"
+                    android:src="@drawable/energy_leaves"
+                    android:contentDescription="@null" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:layout_marginLeft="10dp">
+
+                    <!-- Text -->
+                    <TextView
+                        android:id="@+id/energyTransferTitle"
+                        android:layout_width="190dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginTop="16dp"
+                        android:text="Ready for your next&#10;energy transfer?"
+                        android:textColor="@android:color/white"
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        android:lineSpacingExtra="1dp" />
+
+                    <!-- Yellow divider -->
+                    <View
+                        android:layout_width="50dp"
+                        android:layout_height="2dp"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginTop="5dp"
+                        android:background="#F6D400" />
+
+                    <!-- Book Energy Slot button -->
+                    <LinearLayout
+                        android:id="@+id/bookEnergyButton"
+                        android:layout_width="200dp"
+                        android:layout_height="42dp"
+                        android:layout_marginStart="12dp"
+                        android:layout_marginTop="15dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:background="@drawable/bg_energy_button"
+                        android:clickable="true"
+                        android:focusable="true">
+
+                        <!-- Lightning circle -->
+                        <FrameLayout
+                            android:layout_width="34dp"
+                            android:layout_height="34dp"
+                            android:layout_marginStart="4dp"
+                            android:background="@drawable/bg_lightning_circle">
+
+                            <ImageView
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:layout_gravity="center"
+                                android:src="@drawable/ic_bolt"
+                                android:contentDescription="@null" />
+
+                        </FrameLayout>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:text="Select Power Station"
+                            android:textColor="@android:color/white"
+                            android:textSize="15sp"
+                            android:textStyle="bold" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </FrameLayout>
+
+
+            <!-- ========================= -->
+            <!-- RESERVATIONS SECTION -->
+            <!-- ========================= -->
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="14dp"
+                android:layout_marginTop="28dp"
+                android:layout_marginEnd="14dp"
+                android:orientation="vertical">
+
+                <!-- Section Header -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/reservationsTitle"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Reservations"
+                        android:textColor="@android:color/white"
+                        android:textSize="17sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/viewAllReservations"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="View All ›"
+                        android:textColor="@android:color/white"
+                        android:textSize="11sp"
+                        android:textStyle="bold"
+                        android:alpha="0.9"
+                        android:clickable="true"
+                        android:focusable="true" />
+
+                </LinearLayout>
+
+
+                <!-- ========================= -->
+                <!-- TWO RESERVATION CARDS -->
+                <!-- ========================= -->
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="102dp"
+                    android:layout_marginTop="14dp"
+                    android:orientation="horizontal">
+
+                    <!-- Reservation Card 1 -->
+                    <FrameLayout
+                        android:id="@+id/reservationCardOne"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="6dp"
+                        android:background="@drawable/bg_login_card"
+                        android:padding="14dp">
+
+                        <TextView
+                            android:id="@+id/reservationOneTitle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Solar Check"
+                            android:textColor="@android:color/white"
+                            android:textSize="13sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/reservationOneDate"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="bottom"
+                            android:text="Today · 10:30 AM"
+                            android:textColor="@android:color/white"
+                            android:textSize="10sp"
+                            android:alpha="0.75" />
+
+                    </FrameLayout>
+
+
+                    <!-- Reservation Card 2 -->
+                    <FrameLayout
+                        android:id="@+id/reservationCardTwo"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:layout_marginStart="6dp"
+                        android:background="@drawable/bg_login_card"
+                        android:padding="14dp">
+
+                        <TextView
+                            android:id="@+id/reservationTwoTitle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Maintenance"
+                            android:textColor="@android:color/white"
+                            android:textSize="13sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/reservationTwoDate"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="bottom"
+                            android:text="Tomorrow · 2:00 PM"
+                            android:textColor="@android:color/white"
+                            android:textSize="10sp"
+                            android:alpha="0.75" />
+
+                    </FrameLayout>
+
+                </LinearLayout>
+
+
+                <!-- ========================= -->
+                <!-- CURRENT RESERVATION -->
+                <!-- ========================= -->
+
+                <FrameLayout
+                    android:id="@+id/currentReservationCard"
+                    android:layout_width="match_parent"
+                    android:layout_height="116dp"
+                    android:layout_marginTop="22dp"
+                    android:background="@drawable/bg_login_card"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:id="@+id/currentReservationTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Current Reservation"
+                        android:textColor="@android:color/white"
+                        android:textSize="15sp"
+                        android:textStyle="bold" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="bottom"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/currentReservationName"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Solar Panel Inspection"
+                            android:textColor="@android:color/white"
+                            android:textSize="13sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/currentReservationDetails"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="3dp"
+                            android:text="Today · 10:30 AM"
+                            android:textColor="@android:color/white"
+                            android:textSize="10sp"
+                            android:alpha="0.75" />
+
+                    </LinearLayout>
+
+                </FrameLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</FrameLayout>

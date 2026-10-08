@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="300dp"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="20dp"
+    android:background="@drawable/bg_energy_card">
+
+    <TextView
+        android:id="@+id/stationTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Power Station A"
+        android:textColor="#FFFFFF"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:gravity="center" />
+
+    <TextView
+        android:id="@+id/stationDistance"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="500 m away"
+        android:textColor="#B8D8C4"
+        android:textSize="13sp"
+        android:gravity="center" />
+
+    <Button
+        android:id="@+id/continueButton"
+        android:layout_width="90dp"
+        android:layout_height="36dp"
+        android:layout_marginTop="18dp"
+        android:text="Continue"
+        android:textSize="11sp"
+        android:textColor="#FFFFFF"
+        android:textAllCaps="false"
+        android:background="@drawable/bg_modal_continue_button"
+        android:stateListAnimator="@null" />
+
+</LinearLayout>
